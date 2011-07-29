@@ -135,10 +135,10 @@ class EntitySystem
     template <typename TComponent>
     safe_ptr<TComponent> GetComponent( EntityId entity_id )
     {
-      ComponentSystemBase *s = component_systems_[ TComponent::GetFamilyId() ];
+      ComponentSystemBase *system = component_systems_[ TComponent::GetFamilyId() ];
 
       // Hackish method to cast a component into it's derived object
-      return TComponent::Cast(s)->GetComponent( entity_id );
+      return TComponent::Cast(system)->GetComponent( entity_id );
     }
     
     ////////////////////////////////////////////////////////////
@@ -153,13 +153,13 @@ class EntitySystem
     ///
     ////////////////////////////////////////////////////////////    
     template <typename TComponent>
-    void AddComponent( Entity *e, TComponent *c )
+    void AddComponent( Entity *entity, TComponent *component )
     {
-      component_systems_[ TComponent::GetFamilyId() ]->RegisterComponent( e, c );
+      component_systems_[ TComponent::GetFamilyId() ]->RegisterComponent( entity, component );
 
       // Register the component system's family id with the Entity
       // so it's easier to find this Entity's components later on.
-      e->family_ids_.push_back( TComponent::GetFamilyId() );
+      entity->family_ids_.push_back( TComponent::GetFamilyId() );
     }
 
     ////////////////////////////////////////////////////////////
@@ -179,15 +179,15 @@ class EntitySystem
     template <typename TComponent>
     bool FulfillDependency( EntityId entity_id, safe_ptr<TComponent> *component )
     {
-      if ( (*component) != NULL )
+      if ( (*component) != 0 )
         return true;
 
-      safe_ptr<TComponent> c = GetComponent<TComponent>( entity_id );
+      safe_ptr<TComponent> dependant = GetComponent<TComponent>( entity_id );
 
-      if ( c == NULL )
+      if ( dependant == 0 )
         return false;
 
-      (*component) = c;
+      (*component) = dependant;
 
       return true;
     }
