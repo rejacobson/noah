@@ -25,9 +25,9 @@ void EntitySystem::Update( std::string label, GameState *state )
 }
 
 ////////////////////////////////////////////////////////////////
-void EntitySystem::Update( std::vector<safe_ptr<ComponentSystemBase>> *systems, GameState *state )
+void EntitySystem::Update( std::vector<SafePtr<ComponentSystemBase>> *systems, GameState *state )
 {
-  std::vector<safe_ptr<ComponentSystemBase>>::const_iterator it = systems->begin();
+  std::vector<SafePtr<ComponentSystemBase>>::const_iterator it = systems->begin();
   for ( ; it != systems->end(); ++it )
   {
     (*it)->Update( state );
@@ -35,23 +35,23 @@ void EntitySystem::Update( std::vector<safe_ptr<ComponentSystemBase>> *systems, 
 }
 
 ////////////////////////////////////////////////////////////////
-safe_ptr<ComponentSystemBase> EntitySystem::GetSystem( FamilyId family_id )
+SafePtr<ComponentSystemBase> EntitySystem::GetSystem( FamilyId family_id )
 {
   return component_systems_[ family_id ];
 }
 
 ////////////////////////////////////////////////////////////////
-safe_ptr<Entity> EntitySystem::RegisterEntity( Entity *entity )
+SafePtr<Entity> EntitySystem::RegisterEntity( Entity *entity )
 {
-  safe_ptr<Entity> e(entity);
+  SafePtr<Entity> e(entity);
 
-  entities_.insert( std::pair<EntityId, safe_ptr<Entity>>( entity->id_, e ) );
+  entities_.insert( std::pair<EntityId, SafePtr<Entity>>( entity->id_, e ) );
 
   return e;
 }
 
 ////////////////////////////////////////////////////////////////
-safe_ptr<Entity> EntitySystem::NewEntity( void )
+SafePtr<Entity> EntitySystem::NewEntity( void )
 {
   return RegisterEntity( new Entity( GetNextAvailablentity_id() ) );
 }
@@ -67,7 +67,7 @@ void EntitySystem::InitializeEntity( Entity *entity, GameState *state )
 }
 
 ////////////////////////////////////////////////////////////////
-safe_ptr<Entity> EntitySystem::GetEntity( EntityId entity_id )
+SafePtr<Entity> EntitySystem::GetEntity( EntityId entity_id )
 {
    return entities_[entity_id];
 }
@@ -82,7 +82,7 @@ EntityId EntitySystem::GetNextAvailablentity_id( void )
 ////////////////////////////////////////////////////////////////
 void EntitySystem::KillEntity( EntityId entity_id )
 {
-  safe_ptr<Entity> entity = GetEntity( entity_id );
+  SafePtr<Entity> entity = GetEntity( entity_id );
 
   // Destroy all of the Entity's components
   std::vector<FamilyId>::iterator it = entity->family_ids_.begin();
@@ -92,7 +92,7 @@ void EntitySystem::KillEntity( EntityId entity_id )
   }
 
   // Remove and destroy the Entity
-  std::map<EntityId, safe_ptr<Entity>>::iterator toKill = entities_.find(entity_id);
+  std::map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
   toKill->second.clear();
   entities_.erase(toKill);
 }

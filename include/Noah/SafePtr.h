@@ -1,20 +1,47 @@
-/**
- * Reference counting pointer.
- *
- * Inspired by: http://archive.gamedev.net/reference/articles/article1060.asp#overhead
- */
-#ifndef _SAFE_PTR_H
-#define _SAFE_PTR_H
+////////////////////////////////////////////////////////////
+//
+// Noah - A Component Based Entity System and Game Engine
+// Ryan Jacobson (rejacobson@gmail.com)
+//
+// Reference counting smart pointer.
+//
+// Inspired by: http://archive.gamedev.net/reference/articles/article1060.asp#overhead
+//
+////////////////////////////////////////////////////////////
+
+#ifndef _SafePtr_H
+#define _SafePtr_H
 
 namespace noah
 {
 
+////////////////////////////////////////////////////////////
+/// \brief Pointer reference counter
+///
+////////////////////////////////////////////////////////////
 template <class T>
-struct safe_ptr_reference_counter
+struct SafePtrReferenceCounter
 {
-  safe_ptr_reference_counter( T *ptr = 0 ) : ptr_(ptr), ref_count_(0) { }
-  ~safe_ptr_reference_counter() { clear(); }
+  ////////////////////////////////////////////////////////////
+  /// \brief Default constructor
+  ///
+  /// \param ptr A pointer to the object to be reference counted
+  ///
+  ////////////////////////////////////////////////////////////
+  SafePtrReferenceCounter( T *ptr = 0 ) : ptr_(ptr), ref_count_(0) { }
+  
+  ////////////////////////////////////////////////////////////
+  /// \brief Destructor
+  ///
+  /// 
+  ///
+  ////////////////////////////////////////////////////////////
+  ~SafePtrReferenceCounter() { clear(); }
 
+  ////////////////////////////////////////////////////////////
+  /// \brief Delete the object being pointed at
+  ///
+  ////////////////////////////////////////////////////////////
   void clear( void )
   {
     if ( ptr_ )
@@ -24,58 +51,95 @@ struct safe_ptr_reference_counter
     }
   }
 
-  // Add 1 to the reference count.
+  ////////////////////////////////////////////////////////////
+  /// \brief Add 1 to the reference count
+  ///
+  ////////////////////////////////////////////////////////////
   void addRef() { ref_count_++; }
 
-  // Subtract 1 from the reference count.
-  // Returns true if the reference count has reached 0
-  // and the object should be deleted.
+  ////////////////////////////////////////////////////////////
+  /// \brief Subtract 1 from the reference count.
+  ///
+  /// \return Returns true if the reference count has reached 0 and the object should be deleted.
+  ///
+  ////////////////////////////////////////////////////////////  
   bool subRef() { return (--ref_count_ <= 0); }
 
-  // Number of safe_ptr references to this counter
-  int ref_count_;
+  ////////////////////////////////////////////////////////////
+  // Member data
+  ////////////////////////////////////////////////////////////
 
-  // Pointer to the actual object being used.
-  T *ptr_;
+  int ref_count_; ///< Number of SafePtr references to this counter
+  T *ptr_;        ///< Pointer to the actual object being used.
 };
 
 
+////////////////////////////////////////////////////////////
+/// \brief Safe pointer
+///
+////////////////////////////////////////////////////////////
 template <class T>
-class safe_ptr
+class SafePtr
 {
   public:
-    // Construct from normal pointer, default to NULL
-    safe_ptr( T *ptr = 0 )
+    ////////////////////////////////////////////////////////////
+    /// \brief Construct from normal pointer, default to NULL
+    ///
+    /// \param A normal pointer
+    ///
+    ////////////////////////////////////////////////////////////
+    SafePtr( T *ptr = 0 )
     {
-      ref_counter_ = new safe_ptr_reference_counter<T>( ptr );
+      ref_counter_ = new SafePtrReferenceCounter<T>( ptr );
       addRef();
     }
 
-    // Construct from another smart pointer.  Copy Constructor
-    safe_ptr( const safe_ptr<T> &p )
+    
+    ////////////////////////////////////////////////////////////
+    /// \brief Copy Constructor. Construct from another safe pointer
+    ///
+    /// \param Another safe pointer
+    ///
+    ////////////////////////////////////////////////////////////
+    SafePtr( const SafePtr<T> &p )
     {
       ref_counter_ = p.ref_counter_;
       addRef();
     }
 
-    // Destructor.
-    ~safe_ptr() { subRef(); }
+    ////////////////////////////////////////////////////////////
+    /// \brief Destructor. Subtract from the reference counter
+    ///
+    ////////////////////////////////////////////////////////////
+    ~SafePtr() { subRef(); }
 
-    // Assignment operator.
-    safe_ptr &operator= ( T *ptr )
+    ////////////////////////////////////////////////////////////
+    /// \brief Assignment operator
+    ///
+    /// Change the normal pointer that this safe pointer is taking care of
+    ///
+    /// \param A normal pointer
+    ///
+    ////////////////////////////////////////////////////////////
+    SafePtr &operator= ( T *ptr )
     {
       if ( ref_counter_->ptr_ != ptr )
       {
         subRef();
-        ref_counter_ = new safe_ptr_reference_counter<T>( ptr );
+        ref_counter_ = new SafePtrReferenceCounter<T>( ptr );
         addRef();
       }
 
       return *this;
     }
 
-    // Assignment operator.
-    safe_ptr &operator= ( const safe_ptr &p )
+    ////////////////////////////////////////////////////////////
+    /// \brief Assignment operator
+    ///
+    /// \param Another safe pointer
+    ///
+    ////////////////////////////////////////////////////////////
+    SafePtr &operator= ( const SafePtr &p )
     {
       subRef();
       ref_counter_ = p.ref_counter_;
@@ -83,19 +147,42 @@ class safe_ptr
       return *this;
     }
 
-    // Dereferencing operator. Provided to behave like the normal pointer.
+    ////////////////////////////////////////////////////////////
+    /// \brief Dereferencing operator. Provided to behave like the normal pointer.
+    ///
+    ////////////////////////////////////////////////////////////
     T& operator* () const { return *( ref_counter_->ptr_ ); }
 
-    // Member access operator. Provided to behave like the normal pointer.
+    ////////////////////////////////////////////////////////////
+    /// \brief Member access operator. Provided to behave like the normal pointer.
+    ///
+    ////////////////////////////////////////////////////////////
     T* operator-> () const { return ref_counter_->ptr_; }
 
-    // Conversion operators
+    ////////////////////////////////////////////////////////////
+    /// \brief Conversion operator
+    ///
+    ////////////////////////////////////////////////////////////
     operator T* () const { return ref_counter_->ptr_; }
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Conversion operator
+    ///
+    ////////////////////////////////////////////////////////////
     operator const T* () const { return ref_counter_->ptr_; }
 
-    // boolean test for NULL
+    ////////////////////////////////////////////////////////////
+    /// \brief Boolean test for NULL
+    ///
+    ////////////////////////////////////////////////////////////
 	  operator bool () const { return ref_counter_->ptr_ != 0; }
 
+    ////////////////////////////////////////////////////////////
+    /// \brief Delete the pointed to object
+    ///
+    /// All other safe pointers will return NULL
+    ///
+    ////////////////////////////////////////////////////////////
     void clear( void )
     {
       if ( ref_counter_ && ref_counter_->ptr_ )
@@ -103,28 +190,40 @@ class safe_ptr
     }
 
   private:
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Add 1 to the reference counter
+    ///
+    ////////////////////////////////////////////////////////////
     void addRef()
     {
       // Only change if non-null
       if (ref_counter_) ref_counter_->addRef();
     }
 
+    ////////////////////////////////////////////////////////////
+    /// \brief Subtract 1 from the reference counter
+    ///
+    ////////////////////////////////////////////////////////////
     void subRef()
     {
       // Only change if non-null
-      if (ref_counter_)
+      if ( ref_counter_ )
       {
         // Subtract and test if this was the last pointer.
-	      if (ref_counter_->subRef())
+	      if ( ref_counter_->subRef() )
         {
-
           delete ref_counter_;
           ref_counter_ = 0;
         }
       }
     }
 
-    safe_ptr_reference_counter<T> *ref_counter_;
+    ////////////////////////////////////////////////////////////
+    // Member data
+    ////////////////////////////////////////////////////////////
+
+    SafePtrReferenceCounter<T> *ref_counter_; ///< The reference counter
 };
 
 } // namespace noah

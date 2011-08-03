@@ -85,7 +85,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
-      components_.insert( std::pair<EntityId, safe_ptr<TComponent>>( entity->id_, safe_ptr<TComponent>((TComponent*)component) ) );
+      components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
     }
 
     ////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ class ComponentSystem : public ComponentSystemBase
     template <typename TFunctor>
     void EachComponent( TFunctor *functor )
     {
-      std::map<EntityId, safe_ptr<TComponent>>::iterator i = components_.begin();
+      std::map<EntityId, SafePtr<TComponent>>::iterator i = components_.begin();
       for( ; i != components_.end(); ++i )
       {
         (*functor)( i->first, i->second );
@@ -112,9 +112,9 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void KillComponent( EntityId entity_id )
     {
-      std::map<EntityId, safe_ptr<TComponent>>::iterator toKill = components_.find( entity_id );
+      std::map<EntityId, SafePtr<TComponent>>::iterator toKill = components_.find( entity_id );
 
-      // Delete the component held by the safe_ptr
+      // Delete the component held by the SafePtr
       toKill->second.clear();
 
       // Remove the component from the master list
@@ -126,10 +126,10 @@ class ComponentSystem : public ComponentSystemBase
     ///
     /// \param entity_id The id of the entity to get a component from
     ///
-    /// \return Returns a safe_ptr to the component
+    /// \return Returns a SafePtr to the component
     ///
     ////////////////////////////////////////////////////////////
-    safe_ptr<TComponent> GetComponent( EntityId entity_id )
+    SafePtr<TComponent> GetComponent( EntityId entity_id )
     { 
       return components_[ entity_id ];
     }
@@ -148,7 +148,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    std::map<EntityId, noah::safe_ptr<TComponent>> components_; //< The list of components in this system
+    std::map<EntityId, noah::SafePtr<TComponent>> components_; //< The list of components in this system
     EntitySystem *entity_system_;                               //< The entity system managing this component systme
 };
 
