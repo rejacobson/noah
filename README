@@ -1,11 +1,26 @@
+////////////////////////////////////////////////////////
 // Example Usage
+//
+// Note: The Entity System uses the namespace `noah`.  I 
+// couldn't think of a wicked-awesome name for it so I 
+// just used my son's name.  Maybe he'll be flattered 
+// when he grows up.
+////////////////////////////////////////////////////////
 
-// Create and setup an Entity System with some Component Systems
+// Create an Entity System
 noah::EntitySystem entity_system = noah::EntitySystem();
 
+// Load some Component Systems into it
+// Note the different label on the render system.  This is so the RenderComponentSystem can be
+// updated separately from the rest of the systems.
 entity_system.RegisterComponentSystem( new PositionComponentSystem(), "integration" );
 entity_system.RegisterComponentSystem( new PhysicsComponentSystem(), "integration" );
 entity_system.RegisterComponentSystem( new RenderComponentSystem(), "render" );
+
+// The GameState is an arbitrary struct that can be used to pass data from the game loop to the
+// Component Systems.  Add anything you want to it.  I have it carry over the current time in the
+// loop and a pointer to the World object that I use.
+GameState game_state;
 
 // Create an entity to add components to
 noah::Entity *e = entity_system.NewEntity();
@@ -13,8 +28,6 @@ noah::Entity *e = entity_system.NewEntity();
 entity_system.AddComponent( e, new PositionComponent(position_x, position_y) );
 entity_system.AddComponent( e, new PhysicsComponent(velocity_x, velocity_y) );
 entity_system.AddComponent( e, new RenderComponent("assets/sprite.png") );
-
-GameState game_state;
 
 entity_system.InitializeEntity( e, game_state );
 
