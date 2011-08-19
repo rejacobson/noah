@@ -15,7 +15,7 @@ struct Handler
 enum MessageType {
   CREATE,
   DELETE,
-  NOTIFY
+  MESSAGE
 };
 
 struct Message

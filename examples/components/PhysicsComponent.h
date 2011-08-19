@@ -35,7 +35,7 @@ class PhysicsComponent : public noah::Component <PhysicsComponentSystem>
     PhysicsComponent( float, float );
     PhysicsComponent( sf::Vector2f );
 
-    void Registered( Entity *entity );
+    void Registered( void );
 
     sf::Vector2f velocity_;
     float width_, height_, mass_;

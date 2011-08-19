@@ -50,10 +50,10 @@ PhysicsComponent::PhysicsComponent( sf::Vector2f v )
   : velocity_( v )
 { }
 
-void PhysicsComponent::Registered( Entity *entity )
+void PhysicsComponent::Registered( void )
 {
-  WatchComponent(entity, "Position", &PhysicsComponent::UpdatePosition);
-  WatchMessage(entity, "Moved", &PhysicsComponent::UpdatePosition);
+  //WatchComponent(entity_, "Position", &PhysicsComponent::UpdatePosition);
+  WatchMessage(entity_, "Moved", &PhysicsComponent::UpdatePosition);
 }
 
 void PhysicsComponent::UpdatePosition( Message const &message )

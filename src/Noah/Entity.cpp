@@ -97,10 +97,19 @@ void EntitySystem::KillEntity( EntityId entity_id )
   entities_.erase(toKill);
 }
 
+void EntitySystem::RegisterMessageHandler( std::string message_name, Callback callback )
+{
+
+}
+
+void EntitySystem::RegisterMessageHandler( Entity *entity, std::string message_name, Callback callback )
+{
+  entity->
+}
+
 ////////////////////////////////////////////////////////////////
 Entity::Entity( EntityId entity_id )
-{
-  id_ = entity_id;
-}
+  : id_( entity_id )
+{ }
 
 } // namespace noah

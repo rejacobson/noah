@@ -86,9 +86,11 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
+      component->entity_ = entity;
+
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
 
-      component->Registered( entity );
+      component->Registered();
     }
 
     ////////////////////////////////////////////////////////////
@@ -164,7 +166,7 @@ class ComponentSystem : public ComponentSystemBase
 class ComponentBase
 {
   public:
-    virtual void Registered( Entity *entity ) { }
+    virtual void Registered( void ) { }
 };
 
 ////////////////////////////////////////////////////////////
@@ -214,7 +216,7 @@ class Component : public ComponentBase
     void WatchMessage( std::string message_name, Callback callback )
     {
       Handler handler;
-      handler.component = this;
+      handler.component_ = this;
       handler.callback_ = callback;
 
       component_system_->entity_system->RegisterMessageHandler( message_name, handler );
@@ -223,7 +225,7 @@ class Component : public ComponentBase
     void WatchMessage( Entity *entity, std::string message_name, Callback callback )
     {
       Handler handler;
-      handler.component = this;
+      handler.component_ = this;
       handler.callback_ = callback;
 
       component_system_->entity_system->RegisterMessageHandler( entity, message_name, handler );
@@ -240,6 +242,7 @@ class Component : public ComponentBase
     }
 
   private:
+    Entity *entity_; 
     TSystem *component_system_;
 };
 

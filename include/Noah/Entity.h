@@ -244,7 +244,10 @@ class EntitySystem
     ///
     ////////////////////////////////////////////////////////////
     void KillEntity( EntityId );
-    
+   
+    void RegisterMessageHandler( std::string message_name, Callback callback );
+    void RegisterMessageHandler( Entity *entity, std::string message_name, Callback callback );
+ 
   private:
     ////////////////////////////////////////////////////////////
     // Member data
