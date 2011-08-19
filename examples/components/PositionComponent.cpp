@@ -12,7 +12,7 @@ void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
 {
   noah::SafePtr<PositionComponent> c = GetComponent( eid );
 
-  if ( c == 0 )
+  if ( c == NULL )
     return;
 
   state->world_->RegisterEntity( eid, c->position_ );

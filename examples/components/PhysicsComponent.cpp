@@ -16,10 +16,12 @@ PhysicsComponentSystem::PhysicsComponentSystem( void )
 
 void PhysicsComponentSystem::Update( GameState *state )
 {
+  //// CL_Console::write_line("PhysicsComponentSystem::Update -- Components == %1", components_.size());
+
   std::map<EntityId, noah::SafePtr<PhysicsComponent>>::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
-    if ( i->second->position_component_ == 0 )
+    if ( i->second->position_component_ == NULL )
       continue;
     
    i->second->position_component_->UpdatePosition( i->second->velocity_ );
@@ -37,17 +39,24 @@ void PhysicsComponentSystem::Initialize( EntityId eid, GameState *state )
  *
  */
 PhysicsComponent::PhysicsComponent( void )
-{
-  velocity_ = sf::Vector2f(0, 0);
-}
+  : velocity_( sf::Vector2f(0.0, 0.0) )
+{ }
 
 PhysicsComponent::PhysicsComponent( float x, float y )
-{
-  velocity_ = sf::Vector2f(x, y);
-}
+  : velocity_( sf::Vector2f(x, y) )
+{ }
 
 PhysicsComponent::PhysicsComponent( sf::Vector2f v )
+  : velocity_( v )
+{ }
+
+void PhysicsComponent::Registered( Entity *entity )
 {
-  velocity_ = v;
+  WatchComponent(entity, "Position", &PhysicsComponent::UpdatePosition);
+  WatchMessage(entity, "Moved", &PhysicsComponent::UpdatePosition);
 }
 
+void PhysicsComponent::UpdatePosition( Message const &message )
+{
+
+}

@@ -24,8 +24,8 @@ void RenderComponentSystem::Update( GameState *state )
   std::map<EntityId, noah::SafePtr<RenderComponent>>::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
-    if ( i->second->physics_component_ == 0 ||
-         i->second->physics_component_->position_component_ == 0 ||
+    if ( i->second->physics_component_ == NULL ||
+         i->second->physics_component_->position_component_ == NULL ||
          i->second->sprite_ == 0 )
       continue;
 
@@ -38,7 +38,7 @@ void RenderComponentSystem::Update( GameState *state )
 
     state->window_->Draw( *(i->second->sprite_) );
 
-    // Draw the cell number this entity is currently in
+
     GridCell *cell = state->world_->world_space_->GetCell( i->first );
 
     text->SetString( cell->text_index_->GetString() );

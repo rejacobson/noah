@@ -42,7 +42,6 @@ class PositionComponent : public noah::Component <PositionComponentSystem>
 
     sf::Vector2f position_;
     sf::Vector2f old_position_;
-
     bool changed;
 };
 

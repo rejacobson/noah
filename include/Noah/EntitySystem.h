@@ -41,6 +41,7 @@ namespace noah
 }
 
 #include <Noah/SafePtr.h>
+#include <Noah/Message.h>
 #include <Noah/Entity.h>
 #include <Noah/Component.h>
 

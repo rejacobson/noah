@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Noah/EntitySystem.h>
-#include <map>
+#include <hash_map>
 #include <vector>
 #include <algorithm>
 
@@ -250,10 +250,12 @@ class EntitySystem
     // Member data
     ////////////////////////////////////////////////////////////
 
-    static int component_system_count_;                                                          ///< The number of component systems already registered
-    std::map<EntityId, SafePtr<Entity>> entities_;                                               ///< Master list of Entities
-    std::vector<SafePtr<ComponentSystemBase>> component_systems_;                                ///< Master list of Component Systems
-    std::map<std::string, std::vector<SafePtr<ComponentSystemBase>>> labeled_component_systems_; ///< List of labeled Component Systems
+    static int component_system_count_;                                                                      ///< The number of component systems already registered
+    stdext::hash_map< EntityId, SafePtr<Entity> > entities_;                                                 ///< Master list of Entities
+    std::vector< SafePtr<ComponentSystemBase> > component_systems_;                                          ///< Master list of Component Systems
+    stdext::hash_map< std::string, std::vector< SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
+
+    stdext::hash_map<std::string, Handler> global_message_handlers_;
 };
 
 
@@ -278,6 +280,8 @@ class Entity
     EntityId id_;                         ///< The unique id of the entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
     std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
+
+    stdext::hash_map<std::string, Handler> message_handlers_;
 };
 
 } // namespace noah

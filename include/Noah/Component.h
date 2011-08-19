@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Noah/EntitySystem.h>
+#include <hash_map>
 #include <iostream>
 #include <string>
 
@@ -86,6 +87,8 @@ class ComponentSystem : public ComponentSystemBase
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
+
+      component->Registered( entity );
     }
 
     ////////////////////////////////////////////////////////////
@@ -148,7 +151,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    std::map<EntityId, noah::SafePtr<TComponent>> components_; //< The list of components in this system
+    stdext::hash_map<EntityId, noah::SafePtr<TComponent>> components_; //< The list of components in this system
     EntitySystem *entity_system_;                               //< The entity system managing this component systme
 };
 
@@ -158,7 +161,11 @@ class ComponentSystem : public ComponentSystemBase
 /// \brief Base component class
 ///
 ////////////////////////////////////////////////////////////
-class ComponentBase { };
+class ComponentBase
+{
+  public:
+    virtual void Registered( Entity *entity ) { }
+};
 
 ////////////////////////////////////////////////////////////
 /// \brief The basic component object, managed by a component system
@@ -203,6 +210,37 @@ class Component : public ComponentBase
     ///
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
+
+    void WatchMessage( std::string message_name, Callback callback )
+    {
+      Handler handler;
+      handler.component = this;
+      handler.callback_ = callback;
+
+      component_system_->entity_system->RegisterMessageHandler( message_name, handler );
+    }
+
+    void WatchMessage( Entity *entity, std::string message_name, Callback callback )
+    {
+      Handler handler;
+      handler.component = this;
+      handler.callback_ = callback;
+
+      component_system_->entity_system->RegisterMessageHandler( entity, message_name, handler );
+    }
+
+    void WatchComponent( std::string component_name, Callback callback )
+    {
+
+    }
+
+    void WatchComponent( Entity *entity, std::string component_name, Callback callback )
+    {
+
+    }
+
+  private:
+    TSystem *component_system_;
 };
 
 } // namespace noah
