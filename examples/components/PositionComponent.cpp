@@ -12,7 +12,7 @@ void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
 {
   noah::SafePtr<PositionComponent> c = GetComponent( eid );
 
-  if ( c == NULL )
+  if ( c == 0 )
     return;
 
   state->world_->RegisterEntity( eid, c->position_ );
@@ -20,7 +20,7 @@ void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
 
 void PositionComponentSystem::Update( GameState *state )
 {
-  std::map<EntityId, noah::SafePtr<PositionComponent>>::iterator i = components_.begin();
+  stdext::hash_map<EntityId, noah::SafePtr<PositionComponent>>::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
     if ( i->second->changed == false )
@@ -49,7 +49,7 @@ PositionComponent::PositionComponent( float x, float y )
 
 void PositionComponent::UpdatePosition( float x, float y )
 {
-  UpdatePosition( sf::Vector2f( x, y) );
+  UpdatePosition( sf::Vector2f( x, y ) );
 }
 
 void PositionComponent::UpdatePosition( sf::Vector2f p )

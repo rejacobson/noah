@@ -37,6 +37,7 @@ class PhysicsComponent : public noah::Component <PhysicsComponentSystem>
 
     void Registered( void );
 
+    noah::SafePtr<PositionComponent> position_component_;
     sf::Vector2f velocity_;
     float width_, height_, mass_;
 };

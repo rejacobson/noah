@@ -92,24 +92,31 @@ void EntitySystem::KillEntity( EntityId entity_id )
   }
 
   // Remove and destroy the Entity
-  std::map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
+  stdext::hash_map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
   toKill->second.clear();
   entities_.erase(toKill);
 }
 
-void EntitySystem::RegisterMessageHandler( std::string message_name, Callback callback )
+/*
+void EntitySystem::RegisterMessageHandler( std::string message_name, Handler handler )
 {
-
+  global_message_handlers_[ message_name ].push_back( handler );
 }
 
-void EntitySystem::RegisterMessageHandler( Entity *entity, std::string message_name, Callback callback )
+void EntitySystem::RegisterMessageHandler( Entity *entity, std::string message_name, Handler handler )
 {
-  entity->
+  entity->RegisterMessageHandler( message_name, handler );
 }
+*/
 
 ////////////////////////////////////////////////////////////////
 Entity::Entity( EntityId entity_id )
   : id_( entity_id )
 { }
+
+/*void Entity::RegisterMessageHandler( std::string message_name, Handler handler )
+{
+  message_handlers_[ message_name ].push_back( handler );
+}*/
 
 } // namespace noah

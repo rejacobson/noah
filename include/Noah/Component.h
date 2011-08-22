@@ -11,11 +11,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
 #include <Noah/EntitySystem.h>
-#include <hash_map>
-#include <iostream>
-#include <string>
 
 namespace noah
 {
@@ -86,7 +82,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
-      component->entity_ = entity;
+      ((TComponent*)component)->entity_ = entity;
 
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
 
@@ -102,7 +98,7 @@ class ComponentSystem : public ComponentSystemBase
     template <typename TFunctor>
     void EachComponent( TFunctor *functor )
     {
-      std::map<EntityId, SafePtr<TComponent>>::iterator i = components_.begin();
+      stdext::hash_map<EntityId, SafePtr<TComponent>>::iterator i = components_.begin();
       for( ; i != components_.end(); ++i )
       {
         (*functor)( i->first, i->second );
@@ -117,7 +113,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void KillComponent( EntityId entity_id )
     {
-      std::map<EntityId, SafePtr<TComponent>>::iterator toKill = components_.find( entity_id );
+      stdext::hash_map<EntityId, SafePtr<TComponent>>::iterator toKill = components_.find( entity_id );
 
       // Delete the component held by the SafePtr
       toKill->second.clear();
@@ -153,8 +149,8 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    stdext::hash_map<EntityId, noah::SafePtr<TComponent>> components_; //< The list of components in this system
-    EntitySystem *entity_system_;                               //< The entity system managing this component systme
+    stdext::hash_map< EntityId, noah::SafePtr<TComponent> > components_; //< The list of components in this system
+    EntitySystem *entity_system_;                                        //< The entity system managing this component systme
 };
 
 
@@ -222,7 +218,7 @@ class Component : public ComponentBase
       component_system_->entity_system->RegisterMessageHandler( message_name, handler );
     }
 
-    void WatchMessage( Entity *entity, std::string message_name, Callback callback )
+    /*void WatchMessage( Entity *entity, std::string message_name, Callback callback )
     {
       Handler handler;
       handler.component_ = this;
@@ -239,10 +235,9 @@ class Component : public ComponentBase
     void WatchComponent( Entity *entity, std::string component_name, Callback callback )
     {
 
-    }
+    }*/
 
-  private:
-    Entity *entity_; 
+    Entity *entity_;
     TSystem *component_system_;
 };
 

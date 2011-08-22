@@ -1,32 +1,37 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-#include <Noah/Component.h>
+#include <Noah/EntitySystem.h>
 #include <boost/function.hpp>
+#include <boost/any.hpp>
+
+namespace noah
+{
 
 typedef boost::function<void(Message const &)> Callback;
 
 struct Handler
 {
-  Component *component_;
+  ComponentBase *component_;
   Callback callback_;
 };
 
 enum MessageType {
   CREATE,
-  DELETE,
+  DESTROY,
   MESSAGE
 };
 
 struct Message
 {
   MessageType type;
-  Component *sender;
+  ComponentBase *sender;
   boost::any p;
   Message(MessageType t) : type(t) {};
-  Message(MessageType t, Component *c) : type(t), sender(c) {};
-  Message(MessageType t, Component *c, boost::any payload) : type(t), sender(c), p(payload) {};
+  Message(MessageType t, ComponentBase *c) : type(t), sender(c) {};
+  Message(MessageType t, ComponentBase *c, boost::any payload) : type(t), sender(c), p(payload) {};
 };
 
+} // namespace noah
 
 #endif

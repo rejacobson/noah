@@ -38,7 +38,16 @@ namespace noah
 
   class ComponentSystemBase;
   class ComponentBase;
+
+  struct Message;
+  struct Handler;
 }
+
+#include <hash_map>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
 
 #include <Noah/SafePtr.h>
 #include <Noah/Message.h>

@@ -21,7 +21,7 @@ RenderComponentSystem::RenderComponentSystem( void )
 
 void RenderComponentSystem::Update( GameState *state )
 {
-  std::map<EntityId, noah::SafePtr<RenderComponent>>::iterator i = components_.begin();
+  stdext::hash_map<EntityId, noah::SafePtr<RenderComponent>>::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
     if ( i->second->physics_component_ == NULL ||
