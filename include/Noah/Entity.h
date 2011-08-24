@@ -241,8 +241,10 @@ class EntitySystem
     ////////////////////////////////////////////////////////////
     void KillEntity( EntityId );
    
-    /*void RegisterMessageHandler( std::string message_name, Handler handler );
-    void RegisterMessageHandler( Entity *entity, std::string message_name, Handler handler );*/
+    void RegisterMessageHandler( std::string message_name, Handler handler );
+    void SendMessage( std::string message, ComponentBase *component, boost::any payload );
+    void SendMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload );
+    void SendMessage( std::string message, Message const &msg );
  
   private:
     ////////////////////////////////////////////////////////////
@@ -254,7 +256,7 @@ class EntitySystem
     std::vector< SafePtr<ComponentSystemBase> > component_systems_;                                          ///< Master list of Component Systems
     stdext::hash_map< std::string, std::vector< SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
 
-    //stdext::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
+    stdext::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
 };
 
 
@@ -272,7 +274,8 @@ class Entity
     ///
     ////////////////////////////////////////////////////////////
     Entity( EntityId entity_id );
-    //void RegisterMessageHandler( std::string message_name, Handler handler );
+    void RegisterMessageHandler( std::string message_name, Handler handler );
+    void SendMessage( std::string message, Message const &msg );
     
     ////////////////////////////////////////////////////////////
     // Member data
@@ -281,7 +284,7 @@ class Entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
     std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
 
-    //stdext::hash_map< std::string, std::vector<Handler> > message_handlers_;
+    stdext::hash_map< std::string, std::vector<Handler> > message_handlers_;
 };
 
 } // namespace noah

@@ -2,8 +2,6 @@
 #define _MESSAGE_H
 
 #include <Noah/EntitySystem.h>
-#include <boost/function.hpp>
-#include <boost/any.hpp>
 
 namespace noah
 {

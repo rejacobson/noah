@@ -33,26 +33,22 @@ void PhysicsComponentSystem::Initialize( EntityId eid, GameState *state )
   entity_system_->FulfillDependency<PositionComponent>( eid, &(c->position_component_) );
 }
 
+void PhysicsComponentSystem::Registered( PhysicsComponent *component )
+{
+  HandleMessage( "HasMoved", component, &PhysicsComponentSystem::UpdatePosition );
+}
+
+void PhysicsComponentSystem::UpdatePosition( noah::Message const &message )
+{
+
+}
+
 /**
  *
  */
-PhysicsComponent::PhysicsComponent( void )
-  : velocity_( sf::Vector2f(0.0, 0.0) )
-{ }
-
-PhysicsComponent::PhysicsComponent( float x, float y )
-  : velocity_( sf::Vector2f(x, y) )
-{ }
-
-PhysicsComponent::PhysicsComponent( sf::Vector2f v )
-  : velocity_( v )
-{ }
-
-void PhysicsComponent::Registered( void )
-{
-  //WatchComponent(entity_, "Position", &PhysicsComponent::UpdatePosition);
-  //WatchMessage(entity_, "Moved", &PhysicsComponent::UpdatePosition);
-}
+PhysicsComponent::PhysicsComponent( void ) : velocity_( sf::Vector2f(0.0, 0.0) ) { }
+PhysicsComponent::PhysicsComponent( sf::Vector2f v ) : velocity_( v ) { }
+PhysicsComponent::PhysicsComponent( float x, float y ) : velocity_( sf::Vector2f(x, y) ) { }
 
 /*void PhysicsComponent::UpdatePosition( Message const &message )
 {

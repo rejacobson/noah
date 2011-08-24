@@ -97,26 +97,48 @@ void EntitySystem::KillEntity( EntityId entity_id )
   entities_.erase(toKill);
 }
 
-/*
+
 void EntitySystem::RegisterMessageHandler( std::string message_name, Handler handler )
 {
   global_message_handlers_[ message_name ].push_back( handler );
 }
 
-void EntitySystem::RegisterMessageHandler( Entity *entity, std::string message_name, Handler handler )
+void EntitySystem::SendMessage( std::string message, ComponentBase *component, boost::any payload )
 {
-  entity->RegisterMessageHandler( message_name, handler );
+  SendMessage( message, Message(MESSAGE, component, payload) );
 }
-*/
+
+void EntitySystem::SendMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload )
+{
+  entity->SendMessage( message, Message(MESSAGE, component, payload) );
+}
+
+void EntitySystem::SendMessage( std::string message, Message const &msg )
+{
+  for (std::vector<Handler>::iterator it = global_message_handlers_[message].begin(); it != global_message_handlers_[message].end(); ++it)
+  {
+    (*it).callback_( msg );
+  }
+
+}
 
 ////////////////////////////////////////////////////////////////
 Entity::Entity( EntityId entity_id )
   : id_( entity_id )
 { }
 
-/*void Entity::RegisterMessageHandler( std::string message_name, Handler handler )
+void Entity::RegisterMessageHandler( std::string message_name, Handler handler )
 {
   message_handlers_[ message_name ].push_back( handler );
-}*/
+}
+
+void Entity::SendMessage( std::string message, Message const &msg )
+{
+  for (std::vector<Handler>::iterator it = message_handlers_[message].begin(); it != message_handlers_[message].end(); ++it)
+  {
+    (*it).callback_( msg );
+  }
+
+}
 
 } // namespace noah

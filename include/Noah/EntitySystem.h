@@ -49,6 +49,10 @@ namespace noah
 #include <string>
 #include <algorithm>
 
+#include <boost/function.hpp>
+#include <boost/any.hpp>
+#include <boost/bind.hpp>
+
 #include <Noah/SafePtr.h>
 #include <Noah/Message.h>
 #include <Noah/Entity.h>
