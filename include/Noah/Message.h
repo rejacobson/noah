@@ -12,6 +12,7 @@ struct Handler
 {
   ComponentBase *component_;
   Callback callback_;
+  //Handler( ComponentBase *c, Callback b ) : component_( c ), callback_( b ) {};
 };
 
 enum MessageType {
@@ -22,12 +23,12 @@ enum MessageType {
 
 struct Message
 {
-  MessageType type;
-  ComponentBase *sender;
-  boost::any p;
-  Message(MessageType t) : type(t) {};
-  Message(MessageType t, ComponentBase *c) : type(t), sender(c) {};
-  Message(MessageType t, ComponentBase *c, boost::any payload) : type(t), sender(c), p(payload) {};
+  MessageType type_;
+  ComponentBase *sender_;
+  boost::any payload_;
+  Message( MessageType t ) : type_( t ) {};
+  Message( MessageType t, ComponentBase *c ) : type_( t ), sender_( c ) {};
+  Message( MessageType t, ComponentBase *c, boost::any p ) : type_( t ), sender_( c ), payload_( p ) {};
 };
 
 } // namespace noah

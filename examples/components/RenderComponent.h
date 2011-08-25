@@ -28,7 +28,6 @@ class RenderComponentSystem : public noah::ComponentSystem <RenderComponent>
     ~RenderComponentSystem( void );
     
     void Update( GameState *state = 0 );
-    void Initialize( EntityId, GameState* );
 };
 
 
@@ -40,9 +39,11 @@ class RenderComponent : public noah::Component <RenderComponentSystem>
   public:
     RenderComponent( std::string image = "" );
 
-    noah::SafePtr<sf::Sprite> sprite_;
+    void Registered( void );
+    void HasMoved( noah::Message const &msg );
 
-    noah::SafePtr<PhysicsComponent> physics_component_;
+    noah::SafePtr<sf::Sprite> sprite_;
+    sf::Vector2f velocity_, position_;
 };
 
 

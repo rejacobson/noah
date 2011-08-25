@@ -21,10 +21,6 @@ class PhysicsComponentSystem : public noah::ComponentSystem <PhysicsComponent>
     ~PhysicsComponentSystem( void );
     
     void Update( GameState *state = 0 );
-    void Initialize( EntityId, GameState* );
-
-    void Registered( PhysicsComponent *component );
-    void UpdatePosition( noah::Message const &message );
 };
 
 
@@ -38,7 +34,9 @@ class PhysicsComponent : public noah::Component <PhysicsComponentSystem>
     PhysicsComponent( float, float );
     PhysicsComponent( sf::Vector2f );
 
-    noah::SafePtr<PositionComponent> position_component_;
+    void Registered( void );
+    void HasMoved( noah::Message const &msg );
+
     sf::Vector2f velocity_, position_;
     float width_, height_, mass_;
 };

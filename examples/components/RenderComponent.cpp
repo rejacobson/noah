@@ -21,18 +21,12 @@ RenderComponentSystem::RenderComponentSystem( void )
 
 void RenderComponentSystem::Update( GameState *state )
 {
+  sf::Vector2f pos;
+
   stdext::hash_map<EntityId, noah::SafePtr<RenderComponent>>::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
-    if ( i->second->physics_component_ == NULL ||
-         i->second->physics_component_->position_component_ == NULL ||
-         i->second->sprite_ == 0 )
-      continue;
-
-    sf::Vector2f pos = i->second->physics_component_->position_component_->position_;
-    sf::Vector2f vel = i->second->physics_component_->velocity_;
-
-    pos += ( vel * state->interpolation_ );
+    pos = i->second->position_ + ( i->second->velocity_ * state->interpolation_ );
 
     i->second->sprite_->SetPosition( pos );
 
@@ -42,19 +36,10 @@ void RenderComponentSystem::Update( GameState *state )
     GridCell *cell = state->world_->world_space_->GetCell( i->first );
 
     text->SetString( cell->text_index_->GetString() );
-    text->SetPosition(
-      i->second->physics_component_->position_component_->position_.x,
-      i->second->physics_component_->position_component_->position_.y );
+    text->SetPosition( i->second->position_.x, i->second->position_.y );
 
     state->window_->Draw( *text );
   }
-}
-
-void RenderComponentSystem::Initialize( EntityId eid, GameState *state )
-{
-  noah::SafePtr<RenderComponent> c = GetComponent( eid );
-
-  entity_system_->FulfillDependency<PhysicsComponent>( eid, &(c->physics_component_) );
 }
 
 /**
@@ -68,4 +53,14 @@ RenderComponent::RenderComponent( std::string image )
     sf::Vector2f size = sprite_->GetSize();
     sprite_->SetOrigin( size.x / 2, size.y / 2 );
   }
+}
+
+void RenderComponent::Registered( void )
+{
+  HandleMessage( "HasMoved", &RenderComponent::HasMoved );
+}
+
+void RenderComponent::HasMoved( noah::Message const &msg )
+{
+  position_ = boost::any_cast<sf::Vector2f>( msg.payload_ );
 }

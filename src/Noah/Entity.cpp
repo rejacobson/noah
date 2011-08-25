@@ -103,17 +103,17 @@ void EntitySystem::RegisterMessageHandler( std::string message_name, Handler han
   global_message_handlers_[ message_name ].push_back( handler );
 }
 
-void EntitySystem::SendMessage( std::string message, ComponentBase *component, boost::any payload )
+void EntitySystem::BroadcastMessage( std::string message, ComponentBase *component, boost::any payload )
 {
-  SendMessage( message, Message(MESSAGE, component, payload) );
+  BroadcastMessage( message, Message(MESSAGE, component, payload) );
 }
 
-void EntitySystem::SendMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload )
+void EntitySystem::BroadcastMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload )
 {
-  entity->SendMessage( message, Message(MESSAGE, component, payload) );
+  entity->BroadcastMessage( message, Message(MESSAGE, component, payload) );
 }
 
-void EntitySystem::SendMessage( std::string message, Message const &msg )
+void EntitySystem::BroadcastMessage( std::string message, Message const &msg )
 {
   for (std::vector<Handler>::iterator it = global_message_handlers_[message].begin(); it != global_message_handlers_[message].end(); ++it)
   {
@@ -132,7 +132,7 @@ void Entity::RegisterMessageHandler( std::string message_name, Handler handler )
   message_handlers_[ message_name ].push_back( handler );
 }
 
-void Entity::SendMessage( std::string message, Message const &msg )
+void Entity::BroadcastMessage( std::string message, Message const &msg )
 {
   for (std::vector<Handler>::iterator it = message_handlers_[message].begin(); it != message_handlers_[message].end(); ++it)
   {

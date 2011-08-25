@@ -73,8 +73,6 @@ template <class TComponent>
 class ComponentSystem : public ComponentSystemBase
 {
   public:
-    virtual void Registered( TComponent *component ) { }
-
     ////////////////////////////////////////////////////////////
     /// \brief Add a new component to an entity
     ///
@@ -91,7 +89,7 @@ class ComponentSystem : public ComponentSystemBase
 
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>(c) ) );
 
-      Registered( c );
+      c->Registered();
     }
 
     ////////////////////////////////////////////////////////////
@@ -151,31 +149,7 @@ class ComponentSystem : public ComponentSystemBase
       return components_.size();
     }
     
-    void HandleMessage( std::string message, TComponent *component, Callback callback )
-    {
-      Handler handler;
-      handler.component_ = component;
-      handler.callback_ = callback;
-
-      entity_system_->RegisterMessageHandler( message, handler );
-      component->entity_->RegisterMessageHandler( message, handler );
-    }
-
-    template<class TSystem>
-    void HandleMessage( std::string message, TComponent *component, void (TSystem::*f)(Message const &))
-    {
-      HandleMessage(message, component, boost::bind(f, (TSystem*)(this), _1));
-    }
-
-    void SendMessage( std::string message, boost::any payload )
-    {
-      entity_system_->SendMessage( std::string message, boost::any payload );
-    }
-
-    void SendMessage( Entity *entity, std::string message, boost::any payload )
-    {
-      entity_system_->SendMessage( Entity *entity, std::string message, boost::any payload );
-    }
+    
 
     /*void WatchComponent( std::string component_name, Callback callback )
     {
@@ -200,7 +174,11 @@ class ComponentSystem : public ComponentSystemBase
 /// \brief Base component class
 ///
 ////////////////////////////////////////////////////////////
-class ComponentBase { };
+class ComponentBase
+{
+  public:
+    virtual void Registered( void ) { }
+};
 
 ////////////////////////////////////////////////////////////
 /// \brief The basic component object, managed by a component system
@@ -245,6 +223,32 @@ class Component : public ComponentBase
     ///
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
+
+    void HandleMessage( std::string message, Callback callback )
+    {
+      Handler handler;
+      handler.component_ = this;
+      handler.callback_ = callback;
+
+      component_system_->entity_system_->RegisterMessageHandler( message, handler );
+      entity_->RegisterMessageHandler( message, handler );
+    }
+
+    template<class TSystem>
+    void HandleMessage( std::string message, void (TSystem::*f)(Message const &))
+    {
+      HandleMessage(message, boost::bind(f, (TSystem*)(this), _1));
+    }
+
+    void BroadcastMessage( std::string message, boost::any payload )
+    {
+      component_system_->entity_system_->BroadcastMessage( message, this, payload );
+    }
+
+    void BroadcastMessage( Entity *entity, std::string message, boost::any payload )
+    {
+      component_system_->entity_system_->BroadcastMessage( entity, message, this, payload );
+    }
 
     Entity *entity_;
     TSystem *component_system_;

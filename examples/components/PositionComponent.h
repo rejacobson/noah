@@ -37,8 +37,12 @@ class PositionComponent : public noah::Component <PositionComponentSystem>
     PositionComponent( sf::Vector2f );
     PositionComponent( float, float );
 
-    void UpdatePosition( float, float );
-    void UpdatePosition( sf::Vector2f );
+    void SetPosition( float, float );
+    void SetPosition( sf::Vector2f );
+
+    void Registered( void );
+    void MoveBy( noah::Message const &msg );
+    void MoveTo( noah::Message const &msg );
 
     sf::Vector2f position_;
     sf::Vector2f old_position_;

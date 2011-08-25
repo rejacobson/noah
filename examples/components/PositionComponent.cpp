@@ -1,13 +1,12 @@
 #include "PositionComponent.h"
 
-/**
- * Position Component System
- */
 FamilyId PositionComponentSystem::family_id_ = 0;
 
+////////////////////////////////////////////////////////////////
 PositionComponentSystem::PositionComponentSystem( void )
 { }
 
+////////////////////////////////////////////////////////////////
 void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
 {
   noah::SafePtr<PositionComponent> c = GetComponent( eid );
@@ -18,6 +17,7 @@ void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
   state->world_->RegisterEntity( eid, c->position_ );
 }
 
+////////////////////////////////////////////////////////////////
 void PositionComponentSystem::Update( GameState *state )
 {
   stdext::hash_map<EntityId, noah::SafePtr<PositionComponent>>::iterator i = components_.begin();
@@ -32,29 +32,40 @@ void PositionComponentSystem::Update( GameState *state )
   }
 }
 
-/**
- * Position Component
- */
-PositionComponent::PositionComponent( void )
-  : changed( false )
-{ }
 
-PositionComponent::PositionComponent( sf::Vector2f pos )
-  : position_( pos ), changed( false )
-{ }
+////////////////////////////////////////////////////////////////
+PositionComponent::PositionComponent( void ) : changed( false ) { }
+PositionComponent::PositionComponent( sf::Vector2f pos ) : position_( pos ), changed( false ) { }
+PositionComponent::PositionComponent( float x, float y ) : position_( sf::Vector2f( x, y ) ), changed( false ) { }
 
-PositionComponent::PositionComponent( float x, float y )
-  : position_( sf::Vector2f( x, y ) ), changed( false )
-{ }
-
-void PositionComponent::UpdatePosition( float x, float y )
+////////////////////////////////////////////////////////////////
+void PositionComponent::SetPosition( float x, float y )
 {
-  UpdatePosition( sf::Vector2f( x, y ) );
+  SetPosition( sf::Vector2f( x, y ) );
 }
 
-void PositionComponent::UpdatePosition( sf::Vector2f p )
+////////////////////////////////////////////////////////////////
+void PositionComponent::SetPosition( sf::Vector2f p )
 {
   old_position_ = position_;
   position_ += p;
   changed = true;
+}
+
+////////////////////////////////////////////////////////////////
+void PositionComponent::Registered( void )
+{
+  HandleMessage( "MoveBy", &PositionComponent::MoveBy );
+}
+
+////////////////////////////////////////////////////////////////
+void PositionComponent::MoveBy( noah::Message const &msg )
+{
+  SetPosition( position_ + boost::any_cast<sf::Vector2f>( msg.payload_ ) );
+}
+
+////////////////////////////////////////////////////////////////
+void PositionComponent::MoveTo( noah::Message const &msg )
+{
+  SetPosition( boost::any_cast<sf::Vector2f>( msg.payload_ ) );
 }

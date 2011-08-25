@@ -242,9 +242,9 @@ class EntitySystem
     void KillEntity( EntityId );
    
     void RegisterMessageHandler( std::string message_name, Handler handler );
-    void SendMessage( std::string message, ComponentBase *component, boost::any payload );
-    void SendMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload );
-    void SendMessage( std::string message, Message const &msg );
+    void BroadcastMessage( std::string message, ComponentBase *component, boost::any payload );
+    void BroadcastMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload );
+    void BroadcastMessage( std::string message, Message const &msg );
  
   private:
     ////////////////////////////////////////////////////////////
@@ -275,7 +275,7 @@ class Entity
     ////////////////////////////////////////////////////////////
     Entity( EntityId entity_id );
     void RegisterMessageHandler( std::string message_name, Handler handler );
-    void SendMessage( std::string message, Message const &msg );
+    void BroadcastMessage( std::string message, Message const &msg );
     
     ////////////////////////////////////////////////////////////
     // Member data
