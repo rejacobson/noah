@@ -3,8 +3,7 @@
 FamilyId PositionComponentSystem::family_id_ = 0;
 
 ////////////////////////////////////////////////////////////////
-PositionComponentSystem::PositionComponentSystem( void )
-{ }
+PositionComponentSystem::PositionComponentSystem( void ) { }
 
 ////////////////////////////////////////////////////////////////
 void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
@@ -34,9 +33,8 @@ void PositionComponentSystem::Update( GameState *state )
 
 
 ////////////////////////////////////////////////////////////////
-PositionComponent::PositionComponent( void ) : changed( false ) { }
-PositionComponent::PositionComponent( sf::Vector2f pos ) : position_( pos ), changed( false ) { }
-PositionComponent::PositionComponent( float x, float y ) : position_( sf::Vector2f( x, y ) ), changed( false ) { }
+PositionComponent::PositionComponent( sf::Vector2f pos ) : Component( "Position" ), position_( pos ), changed( false ) { }
+PositionComponent::PositionComponent( float x, float y ) : Component( "Position" ), position_( sf::Vector2f( x, y ) ), changed( false ) { }
 
 ////////////////////////////////////////////////////////////////
 void PositionComponent::SetPosition( float x, float y )

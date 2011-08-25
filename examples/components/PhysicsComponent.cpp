@@ -19,9 +19,9 @@ void PhysicsComponentSystem::Update( GameState *state )
 /**
  *
  */
-PhysicsComponent::PhysicsComponent( void ) : velocity_( sf::Vector2f(0.0, 0.0) ) { }
-PhysicsComponent::PhysicsComponent( sf::Vector2f v ) : velocity_( v ) { }
-PhysicsComponent::PhysicsComponent( float x, float y ) : velocity_( sf::Vector2f(x, y) ) { }
+PhysicsComponent::PhysicsComponent( void ) : Component( "Physics" ), velocity_( sf::Vector2f(0.0, 0.0) ) { }
+PhysicsComponent::PhysicsComponent( sf::Vector2f v ) : Component( "Physics" ), velocity_( v ) { }
+PhysicsComponent::PhysicsComponent( float x, float y ) : Component( "Physics" ), velocity_( sf::Vector2f(x, y) ) { }
 
 void PhysicsComponent::Registered( void )
 {

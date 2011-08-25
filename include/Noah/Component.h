@@ -188,6 +188,8 @@ template <typename TSystem>
 class Component : public ComponentBase
 {
   public:
+    ComponentSystem( std::string name ) : name_( name ) {}
+
     ////////////////////////////////////////////////////////////
     /// \brief Get the family id (component system id) that this component belongs to
     ///
@@ -252,6 +254,7 @@ class Component : public ComponentBase
 
     Entity *entity_;
     TSystem *component_system_;
+    std::string name_;
 };
 
 } // namespace noah

@@ -46,6 +46,7 @@ void RenderComponentSystem::Update( GameState *state )
  * Render Component
  */
 RenderComponent::RenderComponent( std::string image )
+  : Component( "Render" )
 {
   if ( image.size() != 0 )
   {
