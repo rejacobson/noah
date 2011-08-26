@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JS File Read Test</title>
+<script type="text/javascript" src="./lib/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="./lib/creator.js"></script>
+<script type="text/javascript">
+  // Check for the various File API support.
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    // Great success! All the File APIs are supported.
+    //alert('YAY!! Can use File');
+  } else {
+    //alert('The File APIs are not fully supported in this browser.');
+  }
+
+  $(document).ready( function() {
+    console.log( 'document is ready' );
+    $('#canvas').component_editor();
+  });
+
+  
+  
+
+</script>
+<style type="text/css">
+#canvas_container, #canvas {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  margin:50px auto;
+  border: 2px solid green;
+}
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin:0;
+  border: none;
+}
+
+#vertical_bar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 200px;
+  height: 400px;
+  border-right: 1px solid #000;
+}
+#horizontal_bar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 400px;
+  height: 200px;
+  border-bottom: 1px solid #000;
+}
+
+.bounding_box {
+  position: absolute;
+  border: 1px solid red;
+}
+</style>
+</head>
+<body>
+
+  <input type="file" id="files" name="files[]" multiple />
+  <output id="list"></output>
+
+  <div id="images"></div>
+
+  <div id="canvas_container">
+    <div id="vertical_bar">
+      <div id="horizontal_bar">
+        <div id="canvas"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    function handleFileSelect(evt) {
+      var files = evt.target.files; // FileList object
+
+      var images = [];
+      var output = [];
+
+      for ( var i = 0, f; f = files[i]; i++ )
+      {
+        console.log( f );
+
+        if ( ! f.type.match('image.*') )
+          continue;
+
+        images.push( f );
+
+        output.push('<li><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ', f.size, ' bytes</li>');
+      }
+
+      $('#list').html( '<ul>'+ output.join('') +'</ul>' );
+
+      var reader = FileReader();
+
+      reader.onload = function(e)
+      {
+console.log( 'image loaded: ' );
+console.log( e );
+        var img = $('<img>').attr('src', e.target.result);
+        $('#images').append( img );
+
+        console.log( img.width() +":"+ img.height() );
+      };
+
+      for ( var i = 0, img; img = images[i]; ++i )
+      {
+        //var img_element = $('<img>').attr('src', img.mozFullPath);
+        reader.readAsDataURL( img );
+        //$("#image").append( img_element );
+      } 
+    }
+
+    document.getElementById('files').addEventListener('change', handleFileSelect, false);
+  </script> 
+</body>
+</html>
