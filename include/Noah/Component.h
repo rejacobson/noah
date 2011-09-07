@@ -82,14 +82,40 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
+      //std::cerr << "RegisterComponent -- 1 -- NAME == " << component->name_ << std::endl;
+
       TComponent *c = (TComponent*)component;
+
+      //std::cerr << "RegisterComponent -- 2" << std::endl;
 
       c->entity_ = entity;
       c->component_system_ = TComponent::Cast( this );
 
+      //std::cerr << "RegisterComponent -- 3" << std::endl;
+      //std::cerr << "RegisterComponent -- ENTITY ID == " << entity->id_ << std::endl;
+      //std::cerr << "RegisterComponent -- C->ENTITY ID == " << c->entity_->id_ << std::endl;
+
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>(c) ) );
 
+      //std::cerr << "RegisterComponent -- 4" << std::endl;
+
       c->Registered();
+
+      //std::cerr << "RegisterComponent -- 5" << std::endl;
+
+      Message msg(CREATE, c);
+
+      //std::cerr << "RegisterComponent -- 6" << std::endl;
+
+      entity_system_->BroadcastMessage( c->name_, msg );
+
+      //std::cerr << "RegisterComponent -- 7" << std::endl;
+
+      entity->BroadcastMessage( c->name_, msg );
+
+
+
+      //std::cerr << "RegisterComponent -- 8" << std::endl;
     }
 
     ////////////////////////////////////////////////////////////
@@ -148,18 +174,6 @@ class ComponentSystem : public ComponentSystemBase
     {
       return components_.size();
     }
-    
-    
-
-    /*void WatchComponent( std::string component_name, Callback callback )
-    {
-
-    }
-
-    void WatchComponent( Entity *entity, std::string component_name, Callback callback )
-    {
-
-    }*/
 
     ////////////////////////////////////////////////////////////
     // Member data
@@ -178,6 +192,10 @@ class ComponentBase
 {
   public:
     virtual void Registered( void ) { }
+    virtual void Kill( void ) { }
+
+    std::string name_;
+    Entity *entity_;
 };
 
 ////////////////////////////////////////////////////////////
@@ -188,7 +206,15 @@ template <typename TSystem>
 class Component : public ComponentBase
 {
   public:
-    ComponentSystem( std::string name ) : name_( name ) {}
+    Component( std::string name )
+    {
+      name_ = name;
+    }
+
+    void Kill( void )
+    {
+      component_system_->KillComponent( entity_->id_ );
+    }
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the family id (component system id) that this component belongs to
@@ -226,35 +252,65 @@ class Component : public ComponentBase
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
 
-    void HandleMessage( std::string message, Callback callback )
+    template<typename T>
+    void HandleMessage( std::string message, void (T::*f)(Message const &), Entity *entity = 0 )
     {
       Handler handler;
       handler.component_ = this;
-      handler.callback_ = callback;
+      handler.callback_ = boost::bind(f, (T*)(this), _1);
 
-      component_system_->entity_system_->RegisterMessageHandler( message, handler );
-      entity_->RegisterMessageHandler( message, handler );
+      if ( 0 == entity )
+      {
+        component_system_->entity_system_->RegisterMessageHandler( message, handler );
+        entity = entity_;
+      }
+
+      entity->RegisterMessageHandler( message, handler );
     }
 
-    template<class TSystem>
-    void HandleMessage( std::string message, void (TSystem::*f)(Message const &))
+    template<typename T>
+    void WatchComponent( std::string name, void (T::*f)(Message const &), Entity *entity = 0 )
     {
-      HandleMessage(message, boost::bind(f, (TSystem*)(this), _1));
+      //std::cerr << "WatchComponent -- 1 -- THIS == " << name_ << std::endl;
+      Handler handler;
+      handler.component_ = this;
+      handler.callback_ = boost::bind(f, (T*)(this), _1);
+      
+      if ( entity_->components_.count( name ) )
+      {
+        //std::cerr << "WatchComponent -- 2" << std::endl;
+        ComponentBase *c = entity_->components_[ name ];
+        //std::cerr << "WatchComponent -- 3 -- watching == " << c->name_ << std::endl;
+        Message msg(CREATE, c);
+        //std::cerr << "WatchComponent -- 4" << std::endl;
+        handler.callback_( msg );
+        //std::cerr << "WatchComponent -- 5" << std::endl;
+      }
+
+      //std::cerr << "WatchComponent -- 6" << std::endl;
+
+      if ( 0 == entity )
+      {
+        component_system_->entity_system_->RegisterMessageHandler( name, handler );
+        entity = entity_;
+      }
+
+      entity->RegisterMessageHandler( name, handler );
     }
 
     void BroadcastMessage( std::string message, boost::any payload )
     {
-      component_system_->entity_system_->BroadcastMessage( message, this, payload );
+      component_system_->entity_system_->BroadcastMessage( message, Message(MESSAGE, this, payload) );
+      //component_system_->entity_system_->BroadcastMessage( message, this, payload );
     }
 
     void BroadcastMessage( Entity *entity, std::string message, boost::any payload )
     {
-      component_system_->entity_system_->BroadcastMessage( entity, message, this, payload );
+      entity->BroadcastMessage( message, Message(MESSAGE, this, payload) );
+      //component_system_->entity_system_->BroadcastMessage( entity, message, this, payload );
     }
 
-    Entity *entity_;
     TSystem *component_system_;
-    std::string name_;
 };
 
 } // namespace noah

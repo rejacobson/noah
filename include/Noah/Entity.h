@@ -20,7 +20,7 @@ namespace noah
 /// \brief Manages entities, components and component systems
 ///
 ////////////////////////////////////////////////////////////
-class EntitySystem
+class EntitySystem : public Notifier
 {
   public:
     ////////////////////////////////////////////////////////////
@@ -151,11 +151,17 @@ class EntitySystem
     template <typename TComponent>
     void AddComponent( Entity *entity, TComponent *component )
     {
+      //std::cerr << "AddComponent -- 1" << std::endl;
+
       component_systems_[ TComponent::GetFamilyId() ]->RegisterComponent( entity, component );
 
-      // Register the component system's family id with the Entity
-      // so it's easier to find this Entity's components later on.
-      entity->family_ids_.push_back( TComponent::GetFamilyId() );
+      //std::cerr << "AddComponent -- 2" << std::endl;
+
+      SafePtr<ComponentBase> c( component );
+
+      entity->components_[ component->name_ ] = c;
+
+      //std::cerr << "AddComponent -- 3" << std::endl;
     }
 
     ////////////////////////////////////////////////////////////
@@ -196,7 +202,7 @@ class EntitySystem
     /// \return A SafePtr to the entity
     ///
     ////////////////////////////////////////////////////////////    
-    SafePtr<Entity> RegisterEntity( Entity* entity );
+    Entity *RegisterEntity( Entity* entity );
 
     ////////////////////////////////////////////////////////////
     /// \brief Create and register a new Entity
@@ -206,7 +212,7 @@ class EntitySystem
     /// \return A SafePtr to the new entity
     ///
     ////////////////////////////////////////////////////////////
-    SafePtr<Entity> NewEntity( void );
+    Entity *NewEntity( void );
 
     ////////////////////////////////////////////////////////////
     /// \brief Run the initialize method on each entity's components
@@ -233,7 +239,7 @@ class EntitySystem
     /// \return An EntityId
     ///
     ////////////////////////////////////////////////////////////
-    EntityId GetNextAvailablentity_id( void );
+    EntityId GetNextAvailablEntityId( void );
 
     ////////////////////////////////////////////////////////////
     /// \brief Remove an entity and it's components
@@ -241,10 +247,14 @@ class EntitySystem
     ////////////////////////////////////////////////////////////
     void KillEntity( EntityId );
    
-    void RegisterMessageHandler( std::string message_name, Handler handler );
-    void BroadcastMessage( std::string message, ComponentBase *component, boost::any payload );
-    void BroadcastMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload );
-    void BroadcastMessage( std::string message, Message const &msg );
+    //void RegisterMessageHandler( std::string message_name, Handler handler );
+    //void RegisterMessageHandler( Entity *entity, std::string message_name, Handler handler );
+
+    //void BroadcastMessage( std::string message, ComponentBase *component, boost::any payload );
+    //void BroadcastMessage( Entity *entity, std::string message, ComponentBase *component, boost::any payload );
+    //void BroadcastMessage( std::string message, Message const &msg );
+    //void ExecuteHandlers( Message const &msg, std::vector<Handler> *handlers );
+    //std::vector<Handler> *GetHandlers( std::string message );
  
   private:
     ////////////////////////////////////////////////////////////
@@ -256,7 +266,7 @@ class EntitySystem
     std::vector< SafePtr<ComponentSystemBase> > component_systems_;                                          ///< Master list of Component Systems
     stdext::hash_map< std::string, std::vector< SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
 
-    stdext::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
+    //stdext::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
 };
 
 
@@ -264,7 +274,7 @@ class EntitySystem
 /// \brief Entity - The basic game object
 ///
 ////////////////////////////////////////////////////////////
-class Entity
+class Entity : public Notifier
 {
   public:
     ////////////////////////////////////////////////////////////
@@ -274,17 +284,22 @@ class Entity
     ///
     ////////////////////////////////////////////////////////////
     Entity( EntityId entity_id );
-    void RegisterMessageHandler( std::string message_name, Handler handler );
-    void BroadcastMessage( std::string message, Message const &msg );
-    
+   ~Entity( void );
+
+    //void RegisterMessageHandler( std::string message_name, Handler handler );
+    //void BroadcastMessage( std::string message, Message const &msg );
+    //void ExecuteHandlers( Message const &msg, std::vector<Handler> *handlers );
+    //std::vector<Handler> *GetHandlers( std::string message );
+
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
     EntityId id_;                         ///< The unique id of the entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
-    std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
+    //std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
+    stdext::hash_map< std::string, SafePtr<ComponentBase> > components_;    ///< List of component system ids from which this entity has components from
 
-    stdext::hash_map< std::string, std::vector<Handler> > message_handlers_;
+    //stdext::hash_map< std::string, std::vector<Handler> > message_handlers_;
 };
 
 } // namespace noah

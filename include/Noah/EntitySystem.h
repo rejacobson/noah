@@ -44,6 +44,7 @@ namespace noah
 }
 
 #include <hash_map>
+#include <map>
 #include <vector>
 #include <iostream>
 #include <string>
@@ -55,6 +56,7 @@ namespace noah
 
 #include <Noah/SafePtr.h>
 #include <Noah/Message.h>
+#include <Noah/Notifier.h>
 #include <Noah/Entity.h>
 #include <Noah/Component.h>
 

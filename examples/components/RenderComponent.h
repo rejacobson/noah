@@ -40,6 +40,9 @@ class RenderComponent : public noah::Component <RenderComponentSystem>
     RenderComponent( std::string image = "" );
 
     void Registered( void );
+
+    void SyncPosition( noah::Message const &msg );
+    void SyncVelocity( noah::Message const &msg );
     void HasMoved( noah::Message const &msg );
 
     noah::SafePtr<sf::Sprite> sprite_;

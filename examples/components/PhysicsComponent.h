@@ -35,6 +35,8 @@ class PhysicsComponent : public noah::Component <PhysicsComponentSystem>
     PhysicsComponent( sf::Vector2f );
 
     void Registered( void );
+
+    void SyncPosition( noah::Message const &msg );
     void HasMoved( noah::Message const &msg );
 
     sf::Vector2f velocity_, position_;
