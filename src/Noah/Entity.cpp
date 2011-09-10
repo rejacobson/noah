@@ -1,4 +1,5 @@
-#include <Noah/EntitySystem.h>
+//#include <Noah/EntitySystem.h>
+#include <Noah/Entity.h>
 
 namespace noah
 {
@@ -11,6 +12,12 @@ EntitySystem::EntitySystem( void )
 {
   Entity::entity_system_ = this;
 }
+
+/*EntitySystem::~EntitySystem( void )
+{
+  //entities_.clear();
+  //component_systems_.clear();
+}*/
 
 ////////////////////////////////////////////////////////////////
 void EntitySystem::Update( GameState *state )
@@ -47,7 +54,7 @@ Entity *EntitySystem::RegisterEntity( Entity *entity )
 
   SafePtr<Entity> e(entity);
 
-  entities_.insert( std::pair< EntityId, SafePtr<Entity> >( entity->id_, e ) );
+  entities_.insert( rde::pair< EntityId, SafePtr<Entity> >( entity->id_, e ) );
 
   return entity;
 }
@@ -71,7 +78,7 @@ Entity *EntitySystem::NewEntity( void )
 }
 void EntitySystem::InitializeEntity( Entity *entity, GameState *state )
 {
-  stdext::hash_map<std::string, ComponentBase*>::iterator it = entity->components_.begin();
+  rde::hash_map<std::string, ComponentBase*>::iterator it = entity->components_.begin();
   for ( ; it != entity->components_.end(); ++it )
   {
     it->second->component_system_->Initialize( entity->id_, state );
@@ -106,14 +113,21 @@ EntityId EntitySystem::GetNextAvailablEntityId( void )
   }
 
   // Remove and destroy the Entity
-  stdext::hash_map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
+  rde::hash_map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
   toKill->second.clear();
   entities_.erase(toKill);
 }*/
 void EntitySystem::KillEntity( EntityId entity_id )
 {
+  // Destroy all of the Entity's components
+  std::vector< SafePtr<ComponentSystemBase> >::iterator it = component_systems_.begin();
+  for ( ; it != component_systems_.end(); ++it )
+  {
+    (*it)->KillComponent( entity_id );
+  }
+
   // Remove and destroy the Entity
-  stdext::hash_map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
+  rde::hash_map<EntityId, SafePtr<Entity> >::iterator toKill = entities_.find(entity_id);
   toKill->second.clear();
   entities_.erase(toKill);
 }
@@ -172,11 +186,11 @@ Entity::Entity( EntityId entity_id ) : id_( entity_id )
 Entity::~Entity( void )
 {
   // Destroy all of the Entity's components
-  stdext::hash_map< std::string, SafePtr<ComponentBase> >::iterator it = components_.begin();
+  /*rde::hash_map< std::string, SafePtr<ComponentBase>, hash >::iterator it = components_.begin();
   for ( ; it != components_.end(); ++it )
   {
     it->second->Kill();
-  }
+  }*/
 }
 
 /*

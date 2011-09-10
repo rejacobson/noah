@@ -11,7 +11,14 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+
 #include <Noah/EntitySystem.h>
+#include <Noah/Utility.h>
+
+#include <Noah/SafePtr.h>
+#include <Noah/Notifier.h>
+#include <Noah/Message.h>
+#include <Noah/Component.h>
 
 namespace noah
 {
@@ -30,6 +37,8 @@ class EntitySystem : public Notifier
     ///
     ////////////////////////////////////////////////////////////
     EntitySystem( void );
+
+    //~EntitySystem( void );
         
     ////////////////////////////////////////////////////////////
     /// \brief Update all component systems
@@ -262,11 +271,11 @@ class EntitySystem : public Notifier
     ////////////////////////////////////////////////////////////
 
     static int component_system_count_;                                                                      ///< The number of component systems already registered
-    stdext::hash_map< EntityId, SafePtr<Entity> > entities_;                                                 ///< Master list of Entities
+    rde::hash_map< std::string, std::vector< SafePtr<ComponentSystemBase> >, hash > labeled_component_systems_; ///< List of labeled Component Systems
     std::vector< SafePtr<ComponentSystemBase> > component_systems_;                                          ///< Master list of Component Systems
-    stdext::hash_map< std::string, std::vector< SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
-
-    //stdext::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
+    rde::hash_map< EntityId, SafePtr<Entity> > entities_;                                                 ///< Master list of Entities
+    
+    //rde::hash_map< std::string, std::vector<Handler> > global_message_handlers_;
 };
 
 
@@ -297,9 +306,9 @@ class Entity : public Notifier
     EntityId id_;                         ///< The unique id of the entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
     //std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
-    stdext::hash_map< std::string, SafePtr<ComponentBase> > components_;    ///< List of component system ids from which this entity has components from
+    rde::hash_map< std::string, SafePtr<ComponentBase>, hash > components_;    ///< List of component system ids from which this entity has components from
 
-    //stdext::hash_map< std::string, std::vector<Handler> > message_handlers_;
+    //rde::hash_map< std::string, std::vector<Handler> > message_handlers_;
 };
 
 } // namespace noah

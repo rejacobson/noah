@@ -21,6 +21,8 @@ class PhysicsComponentSystem : public noah::ComponentSystem <PhysicsComponent>
     ~PhysicsComponentSystem( void );
     
     void Update( GameState *state = 0 );
+
+    static unsigned int move_by_id_;
 };
 
 

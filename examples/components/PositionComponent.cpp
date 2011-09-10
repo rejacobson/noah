@@ -1,9 +1,13 @@
 #include "PositionComponent.h"
 
 FamilyId PositionComponentSystem::family_id_ = 0;
+unsigned int PositionComponent::has_moved_id_ = 0;
 
 ////////////////////////////////////////////////////////////////
-PositionComponentSystem::PositionComponentSystem( void ) { }
+PositionComponentSystem::PositionComponentSystem( void )
+{
+  PositionComponent::has_moved_id_ = entity_system_->GetHandlerId( "HasMoved" );
+}
 
 ////////////////////////////////////////////////////////////////
 void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
@@ -19,7 +23,7 @@ void PositionComponentSystem::Initialize( EntityId eid, GameState *state )
 ////////////////////////////////////////////////////////////////
 void PositionComponentSystem::Update( GameState *state )
 {
-  /*stdext::hash_map<EntityId, noah::SafePtr<PositionComponent>>::iterator i = components_.begin();
+  rde::hash_map< EntityId, noah::SafePtr<PositionComponent> >::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
     if ( i->second->changed == false )
@@ -28,7 +32,7 @@ void PositionComponentSystem::Update( GameState *state )
    i->second->changed = false;
 
    state->world_->UpdateEntity( i->first, i->second->position_, i->second->old_position_ );
-  }*/
+  }
 }
 
 
@@ -49,7 +53,7 @@ void PositionComponent::SetPosition( sf::Vector2f p )
   position_ = p;
   changed = true;
 
-  BroadcastMessage( entity_, "HasMoved", position_ );
+  BroadcastMessage( entity_, has_moved_id_, position_ );
 }
 
 ////////////////////////////////////////////////////////////////

@@ -23,7 +23,7 @@ void RenderComponentSystem::Update( GameState *state )
 {
   sf::Vector2f pos;
 
-  stdext::hash_map<EntityId, noah::SafePtr<RenderComponent>>::iterator i = components_.begin();
+  rde::hash_map<EntityId, noah::SafePtr<RenderComponent> >::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
     //std::cerr << "RENDER::UPDATE -- 1 -- x == " << i->second->position_.x << " -- y == " << i->second->position_.y << std::endl;

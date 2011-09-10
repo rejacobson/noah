@@ -25,7 +25,7 @@ class RenderComponentSystem : public noah::ComponentSystem <RenderComponent>
     sf::Text *text;
 
     RenderComponentSystem( void );
-    ~RenderComponentSystem( void );
+    //~RenderComponentSystem( void );
     
     void Update( GameState *state = 0 );
 };

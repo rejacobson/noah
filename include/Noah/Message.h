@@ -1,10 +1,17 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-#include <Noah/EntitySystem.h>
+//#include <Noah/Component.h>
+
+#include <boost/function.hpp>
+#include <boost/any.hpp>
+#include <boost/bind.hpp>
 
 namespace noah
 {
+
+class ComponentBase;
+struct Message;
 
 typedef boost::function<void(Message const &)> Callback;
 

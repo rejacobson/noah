@@ -10,6 +10,16 @@
 #ifndef _ENTITY_SYSTEM_H
 #define _ENTITY_SYSTEM_H
 
+#include <rdestl/hash_map.h>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+#include <boost/function.hpp>
+#include <boost/any.hpp>
+#include <boost/bind.hpp>
+
 ////////////////////////////////////////////////////////////
 /// \brief GameState forward declaration
 ///
@@ -43,20 +53,9 @@ namespace noah
   struct Handler;
 }
 
-#include <hash_map>
-#include <map>
-#include <vector>
-#include <iostream>
-#include <string>
-#include <algorithm>
-
-#include <boost/function.hpp>
-#include <boost/any.hpp>
-#include <boost/bind.hpp>
-
-#include <Noah/SafePtr.h>
-#include <Noah/Message.h>
-#include <Noah/Notifier.h>
+//#include <Noah/SafePtr.h>
+//#include <Noah/Message.h>
+//#include <Noah/Notifier.h>
 #include <Noah/Entity.h>
 #include <Noah/Component.h>
 

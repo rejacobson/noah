@@ -4,16 +4,20 @@
  * Physics Component System
  */
 FamilyId PhysicsComponentSystem::family_id_ = 0;
+unsigned int PhysicsComponentSystem::move_by_id_ = 0;
 
-PhysicsComponentSystem::PhysicsComponentSystem( void ) { }
+PhysicsComponentSystem::PhysicsComponentSystem( void )
+{
+  PhysicsComponentSystem::move_by_id_ = entity_system_->GetHandlerId( "MoveBy" );
+}
 
 void PhysicsComponentSystem::Update( GameState *state )
 {
-  stdext::hash_map< EntityId, noah::SafePtr<PhysicsComponent> >::iterator i = components_.begin();
+  rde::hash_map< EntityId, noah::SafePtr<PhysicsComponent> >::iterator i = components_.begin();
   for ( ; i != components_.end(); ++i )
   {
     //std::cerr << "PHYSICS::UPDATE -- 1" << std::endl;
-    i->second->BroadcastMessage( i->second->entity_, "MoveBy", i->second->velocity_ );
+    i->second->BroadcastMessage( i->second->entity_, move_by_id_, i->second->velocity_ );
     //i->second->entity_->BroadcastMessage( "MoveBy", noah::Message(noah::MESSAGE, this, i->second->velocity_) );
   }
 }

@@ -13,6 +13,10 @@
 ////////////////////////////////////////////////////////////
 #include <Noah/EntitySystem.h>
 
+#include <Noah/SafePtr.h>
+#include <Noah/Message.h>
+#include <Noah/Entity.h>
+
 namespace noah
 {
 
@@ -95,7 +99,7 @@ class ComponentSystem : public ComponentSystemBase
       //std::cerr << "RegisterComponent -- ENTITY ID == " << entity->id_ << std::endl;
       //std::cerr << "RegisterComponent -- C->ENTITY ID == " << c->entity_->id_ << std::endl;
 
-      components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>(c) ) );
+      components_.insert( rde::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>(c) ) );
 
       //std::cerr << "RegisterComponent -- 4" << std::endl;
 
@@ -127,7 +131,7 @@ class ComponentSystem : public ComponentSystemBase
     template <typename TFunctor>
     void EachComponent( TFunctor *functor )
     {
-      stdext::hash_map<EntityId, SafePtr<TComponent>>::iterator i = components_.begin();
+      rde::hash_map<EntityId, SafePtr<TComponent> >::iterator i = components_.begin();
       for( ; i != components_.end(); ++i )
       {
         (*functor)( i->first, i->second );
@@ -142,7 +146,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void KillComponent( EntityId entity_id )
     {
-      stdext::hash_map<EntityId, SafePtr<TComponent>>::iterator toKill = components_.find( entity_id );
+      rde::hash_map<EntityId, SafePtr<TComponent> >::iterator toKill = components_.find( entity_id );
 
       // Delete the component held by the SafePtr
       toKill->second.clear();
@@ -178,7 +182,7 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    stdext::hash_map< EntityId, noah::SafePtr<TComponent> > components_; //< The list of components in this system
+    rde::hash_map< EntityId, noah::SafePtr<TComponent> > components_; //< The list of components in this system
     EntitySystem *entity_system_;                                        //< The entity system managing this component systme
 };
 
@@ -213,6 +217,7 @@ class Component : public ComponentBase
 
     void Kill( void )
     {
+      //std::cerr << "Killing Component: " << name_ << " -- eid == " << entity_->id_ << std::endl;
       component_system_->KillComponent( entity_->id_ );
     }
 
@@ -276,7 +281,7 @@ class Component : public ComponentBase
       handler.component_ = this;
       handler.callback_ = boost::bind(f, (T*)(this), _1);
       
-      if ( entity_->components_.count( name ) )
+      if ( entity_->components_.find( name ).node()->is_occupied() )
       {
         //std::cerr << "WatchComponent -- 2" << std::endl;
         ComponentBase *c = entity_->components_[ name ];
@@ -298,17 +303,36 @@ class Component : public ComponentBase
       entity->RegisterMessageHandler( name, handler );
     }
 
+    void BroadcastMessage( unsigned int id, boost::any payload )
+    {
+      component_system_->entity_system_->BroadcastMessage( id, Message(MESSAGE, this, payload) );
+    }
+
     void BroadcastMessage( std::string message, boost::any payload )
     {
       component_system_->entity_system_->BroadcastMessage( message, Message(MESSAGE, this, payload) );
-      //component_system_->entity_system_->BroadcastMessage( message, this, payload );
     }
+
+    /*void BroadcastMessage( unsigned int id, Message const &msg )
+    {
+      component_system_->entity_system_->BroadcastMessage( id, msg );
+    }*/
+
 
     void BroadcastMessage( Entity *entity, std::string message, boost::any payload )
     {
       entity->BroadcastMessage( message, Message(MESSAGE, this, payload) );
-      //component_system_->entity_system_->BroadcastMessage( entity, message, this, payload );
     }
+
+    void BroadcastMessage( Entity *entity, unsigned int id, boost::any payload )
+    {
+      entity->BroadcastMessage( id, Message(MESSAGE, this, payload) );
+    }
+
+    /*void BroadcastMessage( Entity *entity, unsigned int id, Message const &msg )
+    {
+      entity->BroadcastMessage( id, msg );
+    }*/
 
     TSystem *component_system_;
 };
