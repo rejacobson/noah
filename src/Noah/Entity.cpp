@@ -57,14 +57,14 @@ SafePtr<Entity> EntitySystem::NewEntity( void )
 }
 
 ////////////////////////////////////////////////////////////////
-void EntitySystem::InitializeEntity( Entity *entity, GameState *state )
+/*void EntitySystem::InitializeEntity( Entity *entity, GameState *state )
 {
   std::vector<FamilyId>::iterator it = entity->family_ids_.begin();
   for ( ; it != entity->family_ids_.end(); ++it )
   {
-    GetSystem( *it )->Initialize( entity->id_, state );
+    GetSystem( *it )->Initialize( entity, state );
   }
-}
+}*/
 
 ////////////////////////////////////////////////////////////////
 SafePtr<Entity> EntitySystem::GetEntity( EntityId entity_id )

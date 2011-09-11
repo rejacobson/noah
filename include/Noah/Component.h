@@ -63,7 +63,7 @@ class ComponentSystemBase
     /// \param state A pointer to the current GameState
     ///
     ////////////////////////////////////////////////////////////
-    virtual void Initialize( EntityId entity_id, GameState *state ) { }
+    //virtual void Initialize( Entity *entity, GameState *state ) { }
 };
 
 ////////////////////////////////////////////////////////////
@@ -85,7 +85,13 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
+      TComponent *c = (TComponent*)component;
+
+      c->entity_ = entity;
+
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
+
+      c->Registered();
     }
 
     ////////////////////////////////////////////////////////////
@@ -158,7 +164,12 @@ class ComponentSystem : public ComponentSystemBase
 /// \brief Base component class
 ///
 ////////////////////////////////////////////////////////////
-class ComponentBase { };
+class ComponentBase
+{
+  public:
+    virtual void Registered( void ) { }
+    Entity *entity_;
+};
 
 ////////////////////////////////////////////////////////////
 /// \brief The basic component object, managed by a component system

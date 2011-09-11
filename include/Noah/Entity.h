@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Noah/EntitySystem.h>
+#include <Noah/Attribute.h>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -219,7 +220,7 @@ class EntitySystem
     /// \param state The current state of the game
     ///
     ////////////////////////////////////////////////////////////
-    void InitializeEntity( Entity* entity, GameState* state );
+    //void InitializeEntity( Entity* entity, GameState* state );
 
     ////////////////////////////////////////////////////////////
     /// \brief Get an entity by entity_id
@@ -261,7 +262,7 @@ class EntitySystem
 /// \brief Entity - The basic game object
 ///
 ////////////////////////////////////////////////////////////
-class Entity
+class Entity : public Attributes
 {
   public:
     ////////////////////////////////////////////////////////////
