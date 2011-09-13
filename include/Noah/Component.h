@@ -13,6 +13,8 @@
 ////////////////////////////////////////////////////////////
 
 #include <Noah/EntitySystem.h>
+#include <Noah/Callback.h>
+
 #include <iostream>
 #include <string>
 
@@ -88,6 +90,7 @@ class ComponentSystem : public ComponentSystemBase
       TComponent *c = (TComponent*)component;
 
       c->entity_ = entity;
+      c->component_system_ = TComponent::Cast( this );
 
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
 
@@ -203,6 +206,12 @@ class Component : public ComponentBase
       return (TSystem*)base_system;
     }
 
+    template<typename T>
+    Callback CreateCallback( void (T::*f)(void*) )
+    {
+      return boost::bind(f, (T*)(this), _1);
+    }
+
     ////////////////////////////////////////////////////////////
     /// \brief Less than operator 
     ///
@@ -214,6 +223,8 @@ class Component : public ComponentBase
     ///
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
+
+    TSystem *component_system_;
 };
 
 } // namespace noah

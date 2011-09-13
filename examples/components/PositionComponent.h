@@ -19,11 +19,12 @@ class PositionComponentSystem : public noah::ComponentSystem <PositionComponent>
   public:
     static FamilyId family_id_;
 
-    PositionComponentSystem( void );
+    PositionComponentSystem( World *world );
     ~PositionComponentSystem( void );
 
-    //void Initialize( noah::Entity *entity, GameState *state );
-    void Update( GameState* );
+    void Update( GameState *state );
+
+    World *world_;
 };
 
 
@@ -33,19 +34,18 @@ class PositionComponentSystem : public noah::ComponentSystem <PositionComponent>
 class PositionComponent : public noah::Component <PositionComponentSystem>
 {
   public:
-    PositionComponent( sf::Vector2f );
-    PositionComponent( float, float );
+    PositionComponent( sf::Vector2f pos );
+    PositionComponent( float x, float y );
     void Registered( void );
 
     void Moved( void *new_position );
 
-    //void UpdatePosition( float, float );
-    //void UpdatePosition( sf::Vector2f );
-
     sf::Vector2f position_;
     sf::Vector2f old_position_;
 
-    bool changed;
+    bool changed_;
+
+    noah::AttrId position_id_;
 };
 
 

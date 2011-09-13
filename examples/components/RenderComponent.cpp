@@ -52,16 +52,20 @@ void RenderComponentSystem::Update( GameState *state )
 
 
     // Draw the cell number this entity is currently in
-    /*
+    
     GridCell *cell = state->world_->world_space_->GetCell( i->first );
+    
+    //cell->text_index_;
+    
+    //std::cerr << "text_index_ 1 == " << std::endl;
+    //std::cerr << "text_index_ 2 == " << cell->text_index_ << std::endl;
 
-    text->SetString( cell->text_index_->GetString() );
-    text->SetPosition(
-      i->second->physics_component_->position_component_->position_.x,
-      i->second->physics_component_->position_component_->position_.y );
+    std::string s = cell->text_index_->GetString();
 
-    state->window_->Draw( *text );
-    */
+    text->SetString( s );
+    text->SetPosition( pos );
+
+    state->window_->Draw( *text );/**/
   }
 }
 

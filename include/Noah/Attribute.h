@@ -5,9 +5,9 @@
 #include <hash_map>
 #include <iostream>
 
-#include <boost/function.hpp>
+#include <Noah/Callback.h>
+
 #include <boost/any.hpp>
-#include <boost/bind.hpp>
 
 namespace noah
 {
@@ -19,14 +19,6 @@ typedef unsigned int AttrId;
 typedef std::string AttrName;
 typedef stdext::hash_map<AttrName, AttrId> AttrIdHash;
 typedef std::vector<AttributeBase*> AttributeList;
-
-
-typedef boost::function<void(void *)> Callback;
-
-struct Handler
-{
-  Callback callback_;
-};
 
 struct AttributeBase
 {
@@ -89,12 +81,10 @@ class Attributes
     AttrId FindAttrId( AttrName name );
 
     //void WatchAttr( AttrName name );
-    template<typename T>
-    void WatchAttr( AttrName name, void (T::*f)(void*) )
+    void WatchAttr( AttrName name, Callback callback )
     {
       Handler handler;
-      //handler.owner_ = this;
-      handler.callback_ = boost::bind(f, (T*)(this), _1);
+      handler.callback_ = callback;
       
       AttributeBase *a = GetAttr( name );
 
@@ -117,12 +107,12 @@ class Attributes
       attributes_[ id ] = a;
     }
 
-    template <typename T, typename U>
-    void RegisterAttr( AttrName name, T *value, void (U::*f)(void*) )
+    template <typename T>
+    void RegisterAttr( AttrName name, T *value, Callback callback )
     {
       RegisterAttr( name, value );
 
-      WatchAttr( name, f );
+      WatchAttr( name, callback );
     }
 
     template <typename T>
