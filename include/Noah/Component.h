@@ -225,10 +225,10 @@ class Component : public ComponentBase
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
 
     template <typename TComponent>
-    void Requires( TComponent *component )
+    void Requires( TComponent **target )
     {
       missing_dependencies_++;
-      entity_->RequireComponent( this, component );
+      entity_->RequireComponent( this, target );
     }
 
     TSystem *component_system_;

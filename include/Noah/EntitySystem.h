@@ -42,7 +42,7 @@ namespace noah
   struct Dependency
   {
     ComponentBase *requester_;
-    ComponentBase *target_;
+    ComponentBase **target_;
     FamilyId requester_family_id_;
     FamilyId target_family_id_;
   };

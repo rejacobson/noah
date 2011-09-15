@@ -299,7 +299,7 @@ class Entity
     void RequireComponent( name, Dependency d );
 
     template <typename TRequester, typename TTarget>
-    void RequireComponent( TRequester *requester, TTarget *target )
+    void RequireComponent( TRequester *requester, TTarget **target )
     {
       FamilyId requester_id = TRequester::GetFamilyId();
       FamilyId target_id = TTarget::GetFamilyId();
@@ -336,7 +336,7 @@ class Entity
     void FullfillDependency( TComponent *component, Dependency &d )
     {
       d.requester_->missing_dependencies_--;
-      d.target_ = component;
+      *d.target_ = component;
     }
 
     ComponentBase *GetComponent( FamilyId id );
