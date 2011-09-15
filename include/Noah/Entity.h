@@ -156,12 +156,18 @@ class EntitySystem
     template <typename TComponent>
     void AddComponent( Entity *entity, TComponent *component )
     {
+      // An entity can have only one component of each type.
+      if ( 0 != entity->GetComponent( TComponent::GetFamilyId() ) )
+        return;
+
+      // Add the component to it's system
       component_systems_[ TComponent::GetFamilyId() ]->RegisterComponent( entity, component );
 
       // Register the component system's family id with the Entity
       // so it's easier to find this Entity's components later on.
       entity->family_ids_.push_back( TComponent::GetFamilyId() );
 
+      // Register the component with the entity too.
       entity->AddComponent( component );
     }
 
@@ -289,23 +295,51 @@ class Entity
 
       FullfillDependencies( component );
     }
-    
-    template <typename TComponent>
-    void FullfillDependencies( Tcomponent *component )
-    {
-      std::string name = component->name_;
 
-      if ( dependencies_.find(name) == dependencies_.end() )
+    void RequireComponent( name, Dependency d );
+
+    template <typename TRequester, typename TTarget>
+    void RequireComponent( TRequester *requester, TTarget *target )
+    {
+      FamilyId requester_id = TRequester::GetFamilyId();
+      FamilyId target_id = TTarget::GetFamilyId();
+
+      Dependency d;
+      d.requester_ = requester;
+      d.requester_family_id_ = requester_id;
+      d.target_ = target;
+      d.target_family_id_ = target_id;
+
+      dependencies_[ target_id ].push_back( d ); 
+
+      if ( components_.find(target_id) == components_.end() )
         return;
 
-      for ( std::vector<Dependency>::iterator it = dependencies_[ name ].begin(); it != dependencies[ name ].end(); ++it )
-      {
-        it->requester_->missing_depencencies_--;
-        it->target_ = component;
-      }
-
-      dependencies_.erase( name );
+      FullfillDependency( components_[ target_id ], d );
     }
+    
+    template <typename TComponent>
+    void FullfillDependencies( TComponent *component )
+    {
+      FamilyId id = TComponent->GetFamilyId();
+
+      if ( dependencies_.find(id) == dependencies_.end() )
+        return;
+
+      for ( std::vector<Dependency>::iterator it = dependencies_[ id ].begin(); it != dependencies[ id ].end(); ++it )
+      {
+        FullfillDependency( component, *it );
+      }
+    }
+
+    template <typename TComponent>
+    void FullfillDependency( TComponent *component, Dependency &d )
+    {
+      d.requester_->missing_dependencies_--;
+      d.target_ = component;
+    }
+
+    ComponentBase *GetComponent( FamilyId id );
 
     ////////////////////////////////////////////////////////////
     // Member data
@@ -314,7 +348,7 @@ class Entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
     std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
 
-    stdext::hash_map<std::string, std::vector<Dependency> > dependencies_;
+    stdext::hash_map<FamilyId, std::vector<Dependency> > dependencies_;
     std::vector<ComponentBase*> components_;
 };
 

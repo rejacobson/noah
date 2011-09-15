@@ -39,18 +39,12 @@ namespace noah
   class ComponentSystemBase;
   class ComponentBase;
 
-  struct Dependency;
-
-  struct DependencyBase
-  {
-
-  };
-
   struct Dependency
   {
     ComponentBase *requester_;
     ComponentBase *target_;
-    SafePtr<TComponent> *component
+    FamilyId requester_family_id_;
+    FamilyId target_family_id_;
   };
 }
 

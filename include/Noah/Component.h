@@ -225,11 +225,10 @@ class Component : public ComponentBase
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
 
     template <typename TComponent>
-    void Requires( std::string name, TComponent *component )
+    void Requires( TComponent *component )
     {
-      Dependency d;
-      d.requester_ = this;
-      d.target_ = component;
+      missing_dependencies_++;
+      entity_->RequireComponent( this, component );
     }
 
     TSystem *component_system_;

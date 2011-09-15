@@ -99,8 +99,15 @@ void EntitySystem::KillEntity( EntityId entity_id )
 
 ////////////////////////////////////////////////////////////////
 Entity::Entity( EntityId entity_id )
+  : id_( entity_id )
+{ }
+
+ComponentBase *Entity::GetComponent( FamilyId id )
 {
-  id_ = entity_id;
+  if ( id >= components_.size() )
+    return 0;
+
+  return components_[ id ];
 }
 
 } // namespace noah
