@@ -38,6 +38,20 @@ namespace noah
 
   class ComponentSystemBase;
   class ComponentBase;
+
+  struct Dependency;
+
+  struct DependencyBase
+  {
+
+  };
+
+  struct Dependency
+  {
+    ComponentBase *requester_;
+    ComponentBase *target_;
+    SafePtr<TComponent> *component
+  };
 }
 
 #include <Noah/SafePtr.h>

@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Noah/EntitySystem.h>
+#include <hash_map>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -160,6 +161,8 @@ class EntitySystem
       // Register the component system's family id with the Entity
       // so it's easier to find this Entity's components later on.
       entity->family_ids_.push_back( TComponent::GetFamilyId() );
+
+      entity->AddComponent( component );
     }
 
     ////////////////////////////////////////////////////////////
@@ -251,9 +254,9 @@ class EntitySystem
     ////////////////////////////////////////////////////////////
 
     static int component_system_count_;                                                          ///< The number of component systems already registered
-    std::map<EntityId, SafePtr<Entity>> entities_;                                               ///< Master list of Entities
-    std::vector<SafePtr<ComponentSystemBase>> component_systems_;                                ///< Master list of Component Systems
-    std::map<std::string, std::vector<SafePtr<ComponentSystemBase>>> labeled_component_systems_; ///< List of labeled Component Systems
+    std::map<EntityId, SafePtr<Entity> > entities_;                                               ///< Master list of Entities
+    std::vector<SafePtr<ComponentSystemBase> > component_systems_;                                ///< Master list of Component Systems
+    std::map<std::string, std::vector<SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
 };
 
 
@@ -271,13 +274,48 @@ class Entity
     ///
     ////////////////////////////////////////////////////////////
     Entity( EntityId entity_id );
+
+    template <typename TComponent>
+    void AddComponent( TComponent *component )
+    {
+      FamilyId id = TComponent::GetFamilyId();
+
+      if ( components_.size() <= id )
+      {
+        components_.resize( id + 1 );
+      }
+
+      components_[ id ] = component;
+
+      FullfillDependencies( component );
+    }
     
+    template <typename TComponent>
+    void FullfillDependencies( Tcomponent *component )
+    {
+      std::string name = component->name_;
+
+      if ( dependencies_.find(name) == dependencies_.end() )
+        return;
+
+      for ( std::vector<Dependency>::iterator it = dependencies_[ name ].begin(); it != dependencies[ name ].end(); ++it )
+      {
+        it->requester_->missing_depencencies_--;
+        it->target_ = component;
+      }
+
+      dependencies_.erase( name );
+    }
+
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
     EntityId id_;                         ///< The unique id of the entity
     static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
     std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
+
+    stdext::hash_map<std::string, std::vector<Dependency> > dependencies_;
+    std::vector<ComponentBase*> components_;
 };
 
 } // namespace noah

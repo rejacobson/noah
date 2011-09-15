@@ -85,7 +85,14 @@ class ComponentSystem : public ComponentSystemBase
     ////////////////////////////////////////////////////////////
     void RegisterComponent( Entity *entity, ComponentBase *component )
     {
+      TComponent *c = (TComponent*)component;
+
+      c->entity_ = entity;
+      c->component_system_ = TComponent::Cast( this );
+
       components_.insert( std::pair<EntityId, SafePtr<TComponent>>( entity->id_, SafePtr<TComponent>((TComponent*)component) ) );
+
+      c->Registered();
     }
 
     ////////////////////////////////////////////////////////////
@@ -158,7 +165,18 @@ class ComponentSystem : public ComponentSystemBase
 /// \brief Base component class
 ///
 ////////////////////////////////////////////////////////////
-class ComponentBase { };
+class ComponentBase
+{
+  public:
+    ComponentBase( std::string name ) : name_( name ), missing_depencencies_( 0 ) { }
+    virtual void Registered( void ) { }
+
+    std::string name_;
+    Entity *entity_;
+    int missing_depencencies_;
+};
+
+
 
 ////////////////////////////////////////////////////////////
 /// \brief The basic component object, managed by a component system
@@ -168,6 +186,8 @@ template <typename TSystem>
 class Component : public ComponentBase
 {
   public:
+    Component( std::string name ) : ComponentBase( name ) { }
+
     ////////////////////////////////////////////////////////////
     /// \brief Get the family id (component system id) that this component belongs to
     ///
@@ -203,6 +223,16 @@ class Component : public ComponentBase
     ///
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
+
+    template <typename TComponent>
+    void Requires( std::string name, TComponent *component )
+    {
+      Dependency d;
+      d.requester_ = this;
+      d.target_ = component;
+    }
+
+    TSystem *component_system_;
 };
 
 } // namespace noah
