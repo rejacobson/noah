@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////
 
 // Create an Entity System
-noah::EntitySystem entity_system = noah::EntitySystem();
+noah::EntitySystem entity_system;
 
 // Load some Component Systems into it
 // Note the different label on the render system.  This is so the RenderComponentSystem can be
