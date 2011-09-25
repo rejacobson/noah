@@ -52,18 +52,6 @@ class ComponentSystemBase
     ///
     ////////////////////////////////////////////////////////////
     virtual void Update( GameState *state = 0 ) { }
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Run initialization code for an entity.
-    ///
-    /// This is intended to be run once for an entity after it's
-    /// components have been set.
-    ///
-    /// \param entity_id The id of the entity to initialize
-    /// \param state A pointer to the current GameState
-    ///
-    ////////////////////////////////////////////////////////////
-    virtual void Initialize( EntityId entity_id, GameState *state ) { }
 };
 
 ////////////////////////////////////////////////////////////
@@ -168,12 +156,12 @@ class ComponentSystem : public ComponentSystemBase
 class ComponentBase
 {
   public:
-    ComponentBase( std::string name ) : name_( name ), missing_depencencies_( 0 ) { }
+    ComponentBase( std::string name ) : name_( name ), missing_dependencies_( 0 ) { }
     virtual void Registered( void ) { }
 
     std::string name_;
     Entity *entity_;
-    int missing_depencencies_;
+    int missing_dependencies_;
 };
 
 
@@ -228,6 +216,7 @@ class Component : public ComponentBase
     void Requires( TComponent **target )
     {
       missing_dependencies_++;
+      *target = 0;
       entity_->RequireComponent( this, target );
     }
 

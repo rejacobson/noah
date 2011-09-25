@@ -11,15 +11,6 @@
 #define _ENTITY_SYSTEM_H
 
 ////////////////////////////////////////////////////////////
-/// \brief GameState forward declaration
-///
-/// The GameState object is used to carry information about the world and rest of the game from
-/// the game loop to the component systems.
-///
-////////////////////////////////////////////////////////////
-struct GameState;
-
-////////////////////////////////////////////////////////////
 /// \brief Entity unique id
 ///
 ////////////////////////////////////////////////////////////
@@ -33,6 +24,17 @@ typedef unsigned int FamilyId;
 
 namespace noah
 {
+  ////////////////////////////////////////////////////////////
+  /// \brief GameState forward declaration
+  ///
+  /// The GameState object is used to carry information about the world and rest of the game from
+  /// the game loop to the component systems.
+  ///
+  ////////////////////////////////////////////////////////////
+  struct GameState;
+
+  class Game;
+
   class Entity;
   class EntitySystem;
 

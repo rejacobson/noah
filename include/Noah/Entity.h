@@ -28,13 +28,16 @@ namespace noah
 class EntitySystem
 {
   public:
+
+    EntitySystem( void );
+
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
     /// This constructor creates an Entity System.
     ///
     ////////////////////////////////////////////////////////////
-    EntitySystem( void );
+    EntitySystem( Game *game );
         
     ////////////////////////////////////////////////////////////
     /// \brief Update all component systems
@@ -186,12 +189,12 @@ class EntitySystem
     ///
     ////////////////////////////////////////////////////////////    
     template <typename TComponent>
-    bool FulfillDependency( EntityId entity_id, SafePtr<TComponent> *component )
+    bool FulfillDependency( EntityId entity_id, TComponent **component )
     {
       if ( (*component) != 0 )
         return true;
 
-      SafePtr<TComponent> dependant = GetComponent<TComponent>( entity_id );
+      TComponent *dependant = GetComponent<TComponent>( entity_id );
 
       if ( dependant == 0 )
         return false;
@@ -222,15 +225,6 @@ class EntitySystem
     SafePtr<Entity> NewEntity( void );
 
     ////////////////////////////////////////////////////////////
-    /// \brief Run the initialize method on each entity's components
-    ///
-    /// \param entity The entity to initialize
-    /// \param state The current state of the game
-    ///
-    ////////////////////////////////////////////////////////////
-    void InitializeEntity( Entity* entity, GameState* state );
-
-    ////////////////////////////////////////////////////////////
     /// \brief Get an entity by entity_id
     ///
     /// \param entity_id The id of the entity to retrieve
@@ -254,11 +248,14 @@ class EntitySystem
     ////////////////////////////////////////////////////////////
     void KillEntity( EntityId );
     
+  public:
+    static Game *game_;
+
   private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-
+   
     static int component_system_count_;                                                          ///< The number of component systems already registered
     std::map<EntityId, SafePtr<Entity> > entities_;                                               ///< Master list of Entities
     std::vector<SafePtr<ComponentSystemBase> > component_systems_;                                ///< Master list of Component Systems
@@ -296,8 +293,6 @@ class Entity
       FullfillDependencies( component );
     }
 
-    void RequireComponent( name, Dependency d );
-
     template <typename TRequester, typename TTarget>
     void RequireComponent( TRequester *requester, TTarget **target )
     {
@@ -307,12 +302,12 @@ class Entity
       Dependency d;
       d.requester_ = requester;
       d.requester_family_id_ = requester_id;
-      d.target_ = target;
+      d.target_ = (ComponentBase**)target;
       d.target_family_id_ = target_id;
 
       dependencies_[ target_id ].push_back( d ); 
 
-      if ( components_.find(target_id) == components_.end() )
+      if ( target_id >= components_.size() || 0 == components_[ target_id ] )
         return;
 
       FullfillDependency( components_[ target_id ], d );
@@ -321,12 +316,12 @@ class Entity
     template <typename TComponent>
     void FullfillDependencies( TComponent *component )
     {
-      FamilyId id = TComponent->GetFamilyId();
+      FamilyId id = TComponent::GetFamilyId();
 
       if ( dependencies_.find(id) == dependencies_.end() )
         return;
 
-      for ( std::vector<Dependency>::iterator it = dependencies_[ id ].begin(); it != dependencies[ id ].end(); ++it )
+      for ( std::vector<Dependency>::iterator it = dependencies_[ id ].begin(); it != dependencies_[ id ].end(); ++it )
       {
         FullfillDependency( component, *it );
       }

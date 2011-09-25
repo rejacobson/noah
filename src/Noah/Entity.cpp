@@ -4,12 +4,17 @@ namespace noah
 {
 
 int EntitySystem::component_system_count_ = 0;
+Game *EntitySystem::game_ = 0;
 EntitySystem *Entity::entity_system_ = 0;
 
-////////////////////////////////////////////////////////////////
 EntitySystem::EntitySystem( void )
+{ }
+
+////////////////////////////////////////////////////////////////
+EntitySystem::EntitySystem( Game *game )
 {
   Entity::entity_system_ = this;
+  EntitySystem::game_ = game;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -57,16 +62,6 @@ SafePtr<Entity> EntitySystem::NewEntity( void )
 }
 
 ////////////////////////////////////////////////////////////////
-void EntitySystem::InitializeEntity( Entity *entity, GameState *state )
-{
-  std::vector<FamilyId>::iterator it = entity->family_ids_.begin();
-  for ( ; it != entity->family_ids_.end(); ++it )
-  {
-    GetSystem( *it )->Initialize( entity->id_, state );
-  }
-}
-
-////////////////////////////////////////////////////////////////
 SafePtr<Entity> EntitySystem::GetEntity( EntityId entity_id )
 {
    return entities_[entity_id];
@@ -92,9 +87,9 @@ void EntitySystem::KillEntity( EntityId entity_id )
   }
 
   // Remove and destroy the Entity
-  std::map<EntityId, SafePtr<Entity>>::iterator toKill = entities_.find(entity_id);
+  std::map<EntityId, SafePtr<Entity> >::iterator toKill = entities_.find(entity_id);
   toKill->second.clear();
-  entities_.erase(toKill);
+  entities_.erase( toKill );
 }
 
 ////////////////////////////////////////////////////////////////
