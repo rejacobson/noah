@@ -335,6 +335,17 @@ class Entity
 
     ComponentBase *GetComponent( FamilyId id );
 
+    template <typename TComponent>
+    TComponent *GetComponent( void )
+    {
+      FamilyId id = TComponent::GetFamilyId();
+
+      if ( id >= components_.size() || 0 == components_[ id ] )
+        return 0;
+
+      return (TComponent*)components_[ id ];
+    }
+
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
