@@ -6,14 +6,10 @@
 namespace noah
 {
 
-class Game;
-
 struct GameState
 {
   float interpolation_;
   sf::RenderWindow *window_;
-  sf::Sprite *sprite_;
-  Game *game_;
   unsigned long frame_count_;
 };
 

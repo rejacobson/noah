@@ -29,15 +29,13 @@ class EntitySystem
 {
   public:
 
-    EntitySystem( void );
-
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
     /// This constructor creates an Entity System.
     ///
     ////////////////////////////////////////////////////////////
-    EntitySystem( Game *game );
+    EntitySystem( void );
         
     ////////////////////////////////////////////////////////////
     /// \brief Update all component systems
@@ -78,11 +76,12 @@ class EntitySystem
     void RegisterComponentSystem( TSystem *system, std::string label = "" )
     {
       // Return if a Component System of the same type has already been added.
-      if ( TSystem::family_id_ != 0 ) return;
+      if ( TSystem::family_id_ != 0 && system->entity_system_ == 0 ) return;
 
       // Increment the Component System family id
       // Start at 0 so the Component Systems vector can be used like an array
-      TSystem::family_id_ = component_system_count_++;
+      if ( TSystem::family_id_ == 0 )
+        TSystem::family_id_ = component_system_count_++;
 
       // Connect the component system to this entity system.
       system->entity_system_ = this;
@@ -122,7 +121,7 @@ class EntitySystem
     ///
     /// \return A SafePtr to a ComponentSystemBase
     ///
-    ////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////
     SafePtr<ComponentSystemBase> GetSystem( FamilyId family_id );
 
     ////////////////////////////////////////////////////////////
@@ -135,7 +134,7 @@ class EntitySystem
     ///
     /// \return A SafePtr to a component
     ///
-    ////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////
     template <typename TComponent>
     SafePtr<TComponent> GetComponent( EntityId entity_id )
     {
@@ -155,7 +154,7 @@ class EntitySystem
     ///
     /// \return A SafePtr to a component
     ///
-    ////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////
     template <typename TComponent>
     void AddComponent( Entity *entity, TComponent *component )
     {
@@ -178,7 +177,7 @@ class EntitySystem
     /// \brief Find a component on which another component depends on
     ///
     /// Some components require other components to exist in order
-    /// to function.  For example, the Physics component requires
+    /// to function. For example, the Physics component requires
     /// the Position component in order to have a position in the
     /// world to update.
     ///
@@ -187,7 +186,7 @@ class EntitySystem
     ///
     /// \return Returns true if the dependant was found, false otherwise.
     ///
-    ////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////
     template <typename TComponent>
     bool FulfillDependency( EntityId entity_id, TComponent **component )
     {
@@ -211,7 +210,7 @@ class EntitySystem
     ///
     /// \return A SafePtr to the entity
     ///
-    ////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////
     SafePtr<Entity> RegisterEntity( Entity* entity );
 
     ////////////////////////////////////////////////////////////
@@ -228,7 +227,7 @@ class EntitySystem
     /// \brief Get an entity by entity_id
     ///
     /// \param entity_id The id of the entity to retrieve
-    /// 
+    ///
     /// \return A SafePtr to the entity
     ///
     ////////////////////////////////////////////////////////////
@@ -248,17 +247,15 @@ class EntitySystem
     ////////////////////////////////////////////////////////////
     void KillEntity( EntityId );
     
-  public:
-    static Game *game_;
-
   private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
    
-    static int component_system_count_;                                                          ///< The number of component systems already registered
-    std::map<EntityId, SafePtr<Entity> > entities_;                                               ///< Master list of Entities
-    std::vector<SafePtr<ComponentSystemBase> > component_systems_;                                ///< Master list of Component Systems
+    static EntityId entity_counter_;
+    static int component_system_count_; ///< The number of component systems already registered
+    std::map<EntityId, SafePtr<Entity> > entities_; ///< Master list of Entities
+    std::vector<SafePtr<ComponentSystemBase> > component_systems_; ///< Master list of Component Systems
     std::map<std::string, std::vector<SafePtr<ComponentSystemBase> > > labeled_component_systems_; ///< List of labeled Component Systems
 };
 
@@ -277,6 +274,8 @@ class Entity
     ///
     ////////////////////////////////////////////////////////////
     Entity( EntityId entity_id );
+
+    Entity( EntityId entity_id, EntitySystem *system );
 
     template <typename TComponent>
     void AddComponent( TComponent *component )
@@ -305,7 +304,7 @@ class Entity
       d.target_ = (ComponentBase**)target;
       d.target_family_id_ = target_id;
 
-      dependencies_[ target_id ].push_back( d ); 
+      dependencies_[ target_id ].push_back( d );
 
       if ( target_id >= components_.size() || 0 == components_[ target_id ] )
         return;
@@ -339,9 +338,9 @@ class Entity
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    EntityId id_;                         ///< The unique id of the entity
-    static EntitySystem *entity_system_;  ///< Pointer to the entity system managing this entity
-    std::vector<FamilyId> family_ids_;    ///< List of component system ids from which this entity has components from
+    EntityId id_; ///< The unique id of the entity
+    EntitySystem *entity_system_; ///< Pointer to the entity system managing this entity
+    std::vector<FamilyId> family_ids_; ///< List of component system ids from which this entity has components from
 
     stdext::hash_map<FamilyId, std::vector<Dependency> > dependencies_;
     std::vector<ComponentBase*> components_;

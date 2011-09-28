@@ -65,6 +65,12 @@ class ComponentSystem : public ComponentSystemBase
 {
   public:
     ////////////////////////////////////////////////////////////
+    /// \brief Default constructor
+    ///
+    ////////////////////////////////////////////////////////////
+    ComponentSystem( void ) : entity_system_( 0 ) { }
+
+    ////////////////////////////////////////////////////////////
     /// \brief Add a new component to an entity
     ///
     /// \param entity A pointer to the entity
@@ -144,7 +150,7 @@ class ComponentSystem : public ComponentSystemBase
     // Member data
     ////////////////////////////////////////////////////////////
     std::map<EntityId, noah::SafePtr<TComponent>> components_; //< The list of components in this system
-    EntitySystem *entity_system_;                               //< The entity system managing this component systme
+    EntitySystem *entity_system_;                               //< The entity system managing this component system
 };
 
 
@@ -156,7 +162,7 @@ class ComponentSystem : public ComponentSystemBase
 class ComponentBase
 {
   public:
-    ComponentBase( std::string name ) : name_( name ), missing_dependencies_( 0 ) { }
+    ComponentBase( std::string name ) : name_( name ), entity_( 0 ), missing_dependencies_( 0 ) { }
     virtual void Registered( void ) { }
 
     std::string name_;
@@ -174,6 +180,10 @@ template <typename TSystem>
 class Component : public ComponentBase
 {
   public:
+    ////////////////////////////////////////////////////////////
+    /// \brief Default constructor
+    ///
+    ////////////////////////////////////////////////////////////
     Component( std::string name ) : ComponentBase( name ) { }
 
     ////////////////////////////////////////////////////////////
@@ -212,6 +222,12 @@ class Component : public ComponentBase
     ////////////////////////////////////////////////////////////
     bool operator<(Component rhs) { return GetFamilyId() < rhs.GetFamilyId(); }
 
+    ////////////////////////////////////////////////////////////
+    /// \brief Set up a component dependency
+    ///
+    /// 
+    ///
+    ////////////////////////////////////////////////////////////
     template <typename TComponent>
     void Requires( TComponent **target )
     {
@@ -220,7 +236,10 @@ class Component : public ComponentBase
       entity_->RequireComponent( this, target );
     }
 
-    TSystem *component_system_;
+    ////////////////////////////////////////////////////////////
+    // Member data
+    ////////////////////////////////////////////////////////////
+    TSystem *component_system_;  //< The component system this component belongs to
 };
 
 } // namespace noah

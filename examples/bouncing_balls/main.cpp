@@ -1,31 +1,7 @@
+#include <Windows.h>
 #include <SFML/Graphics.hpp>
 #include <Noah/EntitySystem.h>
 #include "Components/AllComponents.h"
-
-class BallScene : public noah::Scene
-{
-  public:
-    BallScene( void ) : noah::Scene()
-    {
-      Initialize();
-    }
-
-    void Initialize( void )
-    {
-      
-      /////////////////////////////////////////////////////////
-    }
-
-    void Update( noah::GameState *state )
-    {
-      entity_system.Update( "integration", state );
-    }
-
-    void Render( noah::GameState *state )
-    {
-      entity_system.Update( "render", state );
-    }
-};
 
 
 int main()
@@ -33,17 +9,18 @@ int main()
   // Create the main window
   sf::RenderWindow window( sf::VideoMode(1000, 700), "SFML window" );
 
+  // Create an Entity System
   noah::EntitySystem entity_system;
 
-  std::cerr << "Setting up entity manager and component systems" << std::endl;
+  // The game state passes information about the game along to the components and component systems
+  noah::GameState game_state;
+  game_state.window_ = &window;
 
   entity_system.RegisterComponentSystem( new PositionComponentSystem(), "integration" );
   entity_system.RegisterComponentSystem( new PhysicsComponentSystem(), "integration" );
   entity_system.RegisterComponentSystem( new RenderComponentSystem(), "render" );
 
-  std::cerr << "Setting up entity manager and component systems -- 3" << std::endl;
-  /////////////////////////////////////////////////////////  
-  
+  // Set up a bunch of entities to throw around the screen
   noah::Entity *e;
 
   srand( (unsigned) time(0) );
@@ -52,8 +29,8 @@ int main()
 
   float speed = 10.0;
 
-  float center_x = 500.0; //(float)window_->GetWidth() / 2;
-  float center_y = 350.0; //(float)window_->GetHeight() / 2;
+  float center_x = (float)window.GetWidth() / 2;
+  float center_y = (float)window.GetHeight() / 2;
 
   for ( int i = 0; i < 10; i++ )
   {
@@ -64,12 +41,11 @@ int main()
 
     entity_system.AddComponent( e, new PositionComponent(center_x, center_y) );
     entity_system.AddComponent( e, new PhysicsComponent(x, y) );
-    //entity_system.AddComponent( e, new CollisionComponent() );
     entity_system.AddComponent( e, new RenderComponent("Assets/bluesphere.png") );
   } 
 
 
-
+  // Main game loop
   const int TICKS_PER_SECOND = 25;
   const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
   const int MAX_FRAMESKIP = 5;
@@ -77,16 +53,16 @@ int main()
   DWORD next_game_tick = GetTickCount();
   int loops;
 
-  while ( window_->IsOpened() )
+  while ( window.IsOpened() )
   {
     // Handle events
     sf::Event event;
-    while ( window_->PollEvent(event) )
+    while ( window.PollEvent(event) )
     {
         // Window closed or escape key pressed : exit
         if ( ( event.Type == sf::Event::Closed ) || ( ( event.Type == sf::Event::KeyPressed ) && ( event.Key.Code == sf::Keyboard::Escape ) ) )
         {
-            window_->Close();
+            window.Close();
             break;
         }
     }
@@ -95,41 +71,25 @@ int main()
     
     while ( GetTickCount() > next_game_tick && loops < MAX_FRAMESKIP )
     {
-        game_state_->frame_count_++;
+        game_state.frame_count_++;
 
         next_game_tick += SKIP_TICKS;
 
-        if ( 0 != current_scene_ )
-        {
-          current_scene_->Update( game_state_ );
-        }
+        // Update the position and physics components
+        entity_system.Update( "integration", &game_state );
 
         loops++;
     }
 
-    game_state_->interpolation_ = float( GetTickCount() + SKIP_TICKS - next_game_tick )
+    game_state.interpolation_ = float( GetTickCount() + SKIP_TICKS - next_game_tick )
                     / float( SKIP_TICKS );
 
-    // Clear screen
-    window_->Clear();
+    window.Clear();
 
-    //terrain_.Render( game_state_ );
+    // Render the entities
+    entity_system.Update( "render", &game_state );
 
-    //world_space_->Render( game_state_ );
-
-    //entity_system.Update( "render", game_state_ );
-    if ( 0 != current_scene_ )
-    {
-      current_scene_->Render( game_state_ );
-    }
-
-    window_->Display();
-
-    if ( 0 != next_scene_ )
-    {
-      current_scene_ = next_scene_;
-      next_scene_ = 0;
-    }
+    window.Display();
   }
 
   return 0;

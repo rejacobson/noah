@@ -3,19 +3,12 @@
 namespace noah
 {
 
+EntityId EntitySystem::entity_counter_ = 0;
 int EntitySystem::component_system_count_ = 0;
-Game *EntitySystem::game_ = 0;
-EntitySystem *Entity::entity_system_ = 0;
-
-EntitySystem::EntitySystem( void )
-{ }
 
 ////////////////////////////////////////////////////////////////
-EntitySystem::EntitySystem( Game *game )
-{
-  Entity::entity_system_ = this;
-  EntitySystem::game_ = game;
-}
+EntitySystem::EntitySystem( void )
+{ }
 
 ////////////////////////////////////////////////////////////////
 void EntitySystem::Update( GameState *state )
@@ -58,7 +51,7 @@ SafePtr<Entity> EntitySystem::RegisterEntity( Entity *entity )
 ////////////////////////////////////////////////////////////////
 SafePtr<Entity> EntitySystem::NewEntity( void )
 {
-  return RegisterEntity( new Entity( GetNextAvailablentity_id() ) );
+  return RegisterEntity( new Entity( GetNextAvailablentity_id(), this ) );
 }
 
 ////////////////////////////////////////////////////////////////
@@ -70,8 +63,7 @@ SafePtr<Entity> EntitySystem::GetEntity( EntityId entity_id )
 ////////////////////////////////////////////////////////////////
 EntityId EntitySystem::GetNextAvailablentity_id( void )
 {
-  static EntityId counter = 0;
-  return ++counter;
+  return ++entity_counter_;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -97,6 +89,12 @@ Entity::Entity( EntityId entity_id )
   : id_( entity_id )
 { }
 
+////////////////////////////////////////////////////////////////
+Entity::Entity( EntityId entity_id, EntitySystem *system )
+  : id_( entity_id ), entity_system_( system )
+{ }
+
+////////////////////////////////////////////////////////////////
 ComponentBase *Entity::GetComponent( FamilyId id )
 {
   if ( id >= components_.size() )

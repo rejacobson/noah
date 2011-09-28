@@ -85,11 +85,9 @@
     <ClInclude Include="..\..\include\Noah\Component.h" />
     <ClInclude Include="..\..\include\Noah\Entity.h" />
     <ClInclude Include="..\..\include\Noah\EntitySystem.h" />
-    <ClInclude Include="..\..\include\Noah\Game.h" />
     <ClInclude Include="..\..\include\Noah\GameState.h" />
     <ClInclude Include="..\..\include\Noah\ResourceManager.h" />
     <ClInclude Include="..\..\include\Noah\SafePtr.h" />
-    <ClInclude Include="..\..\include\Noah\Scene.h" />
     <ClInclude Include="Components\AllComponents.h" />
     <ClInclude Include="Components\PhysicsComponent.h" />
     <ClInclude Include="Components\PositionComponent.h" />
@@ -98,8 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Noah\Entity.cpp" />
-    <ClCompile Include="..\..\src\Noah\Game.cpp" />
-    <ClCompile Include="..\..\src\Noah\Scene.cpp" />
     <ClCompile Include="Components\PhysicsComponent.cpp" />
     <ClCompile Include="Components\PositionComponent.cpp" />
     <ClCompile Include="Components\RenderComponent.cpp" />
