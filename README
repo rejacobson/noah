@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////
 
 // Create an Entity System
-noah::EntitySystem entity_system = noah::EntitySystem();
+noah::EntitySystem entity_system;
 
 // Load some Component Systems into it
 // Note the different label on the render system.  This is so the RenderComponentSystem can be
@@ -19,7 +19,7 @@ entity_system.RegisterComponentSystem( new RenderComponentSystem(), "render" );
 
 // The GameState is an arbitrary struct that can be used to pass data from the game loop to the
 // Component Systems.  Add anything you want to it.  I have it carry over the current time in the
-// loop and a pointer to the World object that I use.
+// loop.
 GameState game_state;
 
 // Create an entity to add components to
@@ -28,8 +28,6 @@ noah::Entity *e = entity_system.NewEntity();
 entity_system.AddComponent( e, new PositionComponent(position_x, position_y) );
 entity_system.AddComponent( e, new PhysicsComponent(velocity_x, velocity_y) );
 entity_system.AddComponent( e, new RenderComponent("assets/sprite.png") );
-
-entity_system.InitializeEntity( e, game_state );
 
 // In the game loop
 while ( game_is_running )
