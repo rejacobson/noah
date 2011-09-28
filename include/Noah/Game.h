@@ -6,6 +6,7 @@
 #include <time.h>
 #include <Windows.h>
 
+#include <Noah/Scene.h>
 #include <Noah/GameState.h>
 #include <Noah/EntitySystem.h>
 
@@ -24,6 +25,7 @@ class Game
     void RegisterEntity( EntityId, sf::Vector2f position );
     void UpdateEntity( EntityId, sf::Vector2f position, sf::Vector2f old_position );
     int Run( void );
+    void SetScene( Scene *scene );
 
     virtual void Update() { std::cerr << "Updating base Game class. Inherit your own main game class from this one" << std::endl; }
     virtual void Render() { std::cerr << "Rendering base Game class. Inherit your own main game class from this one" << std::endl; }
@@ -36,12 +38,12 @@ class Game
 
   public:
     sf::RenderWindow *window_;
-    EntitySystem entity_system_;
 
   private:
-    void Initialize( void );
-  
     bool game_is_running_;
+    Scene *current_scene_;
+    Scene *next_scene_;
+    //std::vector<Scene*> scenes_;
     //Terrain terrain_;
 };
 

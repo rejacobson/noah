@@ -33,7 +33,7 @@ namespace noah
   ////////////////////////////////////////////////////////////
   struct GameState;
 
-  class Game;
+  class Scene;
 
   class Entity;
   class EntitySystem;

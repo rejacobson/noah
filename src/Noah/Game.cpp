@@ -1,35 +1,30 @@
 #include <Noah/Game.h>
-//#include "Components/AllComponents.h"
 
 namespace noah
 {
 
 Game::Game( sf::RenderWindow *display_window )
-  : window_(display_window), game_is_running_(false)
+  : window_(display_window), game_is_running_(false), current_scene_( 0 ), next_scene_( 0 )
 {
   game_state_ = new noah::GameState;
 
   game_state_->window_ = window_;
   game_state_->game_ = this;
   game_state_->frame_count_ = 0;
-
-  entity_system_ = EntitySystem( this );
 }
 
-/*void Game::RegisterEntity( EntityId eid, sf::Vector2f position )
+void Game::SetScene( Scene *scene )
 {
-  world_space_->RegisterEntity( eid, position );
-}
+  scene->game = this;
 
-void Game::UpdateEntity( EntityId eid, sf::Vector2f position, sf::Vector2f old_position )
-{
-  //world_space_->UpdateEntity( eid, position, old_position );
-}
+  if ( 0 == current_scene_ )
+  {
+    current_scene_ = scene;
+    return;
+  }
 
-bool Game::CollidesWithTerrain( EntityId entity_id, CollisionState &collision_state )
-{
-  return false;
-}*/
+  next_scene_ = scene;
+}
 
 int Game::Run( void )
 {
@@ -38,7 +33,6 @@ int Game::Run( void )
   const int MAX_FRAMESKIP = 5;
 
   DWORD next_game_tick = GetTickCount();
-  //DWORD ticks = 0;
   int loops;
 
   while ( window_->IsOpened() )
@@ -61,18 +55,14 @@ int Game::Run( void )
     {
         game_state_->frame_count_++;
 
-        //entity_system_.Update( "integration", game_state_ );
-
-        //if ( ticks % 2 == 0 ) entity_system_.Update( "position", game_state_ );
-
-        //if ( (ticks+1) % 2 == 0 ) entity_system_.Update( "physics", game_state_ );
-
         next_game_tick += SKIP_TICKS;
 
-        Update();
+        if ( 0 != current_scene_ )
+        {
+          current_scene_->Update( game_state_ );
+        }
 
         loops++;
-        //++ticks;
     }
 
     game_state_->interpolation_ = float( GetTickCount() + SKIP_TICKS - next_game_tick )
@@ -86,9 +76,18 @@ int Game::Run( void )
     //world_space_->Render( game_state_ );
 
     //entity_system_.Update( "render", game_state_ );
-    Render();
+    if ( 0 != current_scene_ )
+    {
+      current_scene_->Render( game_state_ );
+    }
 
     window_->Display();
+
+    if ( 0 != next_scene_ )
+    {
+      current_scene_ = next_scene_;
+      next_scene_ = 0;
+    }
   }
 
   return 0;
